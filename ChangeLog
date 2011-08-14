@@ -1,0 +1,7 @@
+2011-08-14  Kevin Polulak  <kpolulak@gmail.com>
+	* Released 0.0.1
+	No tests yet
+	No documentation
+	Only provides lc_irc(), uc_irc(), and eq_irc()
+	README
+
