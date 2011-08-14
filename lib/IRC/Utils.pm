@@ -68,7 +68,7 @@ The C<$type> parameter is optional and represents the casemapping. It can be
 Returns C<Bool::True> if the nicknames are equivalent and C<Bool::False>
 otherwise.
 
-=head2 B<numeric_to_name($code)>
+=head2 B<numeric_to_name(Int $code)>
 
 Converts a numeric code to its string representation. Includes all values
 defined by RFC1459 but also includes a few network-specific extensions.
@@ -78,7 +78,7 @@ error code. For instance, 461 which is C<ERR_NEEDMOREPARAMS>.
 
 Returns the string representation of C<$code>.
 
-=head2 B<name_to_numeric($name)>
+=head2 B<name_to_numeric(Str $name)>
 
 Converts a string to its numeric representation. Includes all values
 defined by RFC1459 but also includes a few network-specific extensions.
@@ -335,11 +335,11 @@ for %NAME2NUMERIC.kv -> $key, $val {
     %NUMERIC2NAME<$val> = $key;
 }
 
-sub numeric_to_name($code) is export {
+sub numeric_to_name(Int $code) is export {
     return %NUMERIC2NAME<$code>;
 }
 
-sub name_to_numeric($name) is export {
+sub name_to_numeric(Str $name) is export {
     return %NAME2NUMERIC<$name>;
 }
 
