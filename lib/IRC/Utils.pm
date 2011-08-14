@@ -1,8 +1,100 @@
+=begin Pod
+
+=head1 NAME
+
+IRC::Utils - useful utilities for use in other IRC-related modules
+
+=head1 SYNOPSIS
+
+    use IRC::Utils;
+
+    my Str $nick    = '^Lame|BOT[moo]';
+    my Str $uc_nick = uc_irc($nick);
+    my Str $lc_nick = lc_irc($nick);
+
+    # Check equivalence of two nicknames
+    if eq_irc($uc_nick, $lc_nick) {
+        say "These nicknames are the same!";
+    }
+
+=head1 DESCRIPTION
+
+The C<IRC::Utils> module provides a procedural interface for performing many
+common IRC-related tasks such as comparing nicknames, changing user modes,
+normalizing ban masks, etc. It is meant to be used as a base module for
+creating other IRC-related modules.
+
+=head1 SUBROUTINES
+
+=head2 B<uc_irc(Str $value, Str $type)>
+
+Converts a string to uppercase that conforms to the allowable characters as
+defined by RFC 1459.
+
+The C<$value> parameter is required and represents the string to convert to
+uppercase.
+
+The C<$type> parameter is optional and represents the casemapping. It can be
+'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+
+Returns the value of C<$value> converted to uppercase according to C<$type>.
+
+=head2 B<lc_irc(Str $value, Str $type)>
+
+Converts a string to lowercase that conforms to the allowable characters as
+defined by RFC 1459.
+
+The C<$value> parameter is required and represents the string to convert to
+lowercase.
+
+The C<$type> parameter is optional and represents the casemapping. It can be
+'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+
+Returns the value of C<$value> converted to lowercase according to C<$type>.
+
+=head2 B<eq_irc(Str $first, Str $second, Str $type)>
+
+Checks the equivalence of two strings.
+
+The C<$first> parameter is a string representing the first string to
+compare.
+
+The C<$second> parameter is a string representing the second string to
+compare.
+
+The C<$type> parameter is optional and represents the casemapping. It can be
+'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+
+Returns C<Bool::True> if the nicknames are equivalent and C<Bool::False>
+otherwise.
+
+=head2 B<numeric_to_name($code)>
+
+Converts a numeric code to its string representation. Includes all values
+defined by RFC1459 but also includes a few network-specific extensions.
+
+The C<$code> parameter is an integer representing the numerical reply or
+error code. For instance, 461 which is C<ERR_NEEDMOREPARAMS>.
+
+Returns the string representation of C<$code>.
+
+=head2 B<name_to_numeric($name)>
+
+Converts a string to its numeric representation. Includes all values
+defined by RFC1459 but also includes a few network-specific extensions.
+
+The C<$name> parameter is a string representing the reply or error code. For
+instance, C<ERR_NEEDMOREPARAMS> is 461.
+
+Returns the numerical representation of C<$name>.
+
+=end Pod
+
 module IRC::Utils;
 
 our $NORMAL      = "\x0f";
  
-# Formatting
+# Text formats
 our $BOLD        = "\x02";
 our $UNDERLINE   = "\x1f";
 our $REVERSE     = "\x16";
@@ -10,7 +102,7 @@ our $ITALIC      = "\x1d";
 our $FIXED       = "\x11";
 our $BLINK       = "\x06";
  
-# mIRC colors
+# Color formats
 our $WHITE       = "\x0300";
 our $BLACK       = "\x0301";
 our $BLUE        = "\x0302";
@@ -28,7 +120,7 @@ our $PINK        = "\x0313";
 our $GREY        = "\x0314";
 our $LIGHT_GREY  = "\x0315";
  
-# list originally snatched from AnyEvent::IRC::Util
+# Associates numeric codes with their string representation
 our %NAME2NUMERIC = (
     :RPL_WELCOME(001),           # RFC2812
     :RPL_YOURHOST(002),          # RFC2812
