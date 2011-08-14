@@ -1,3 +1,5 @@
+# Copyright (C) 2011, Kevin Polulak <kpolulak@gmail.com>.
+
 =begin Pod
 
 =head1 NAME
