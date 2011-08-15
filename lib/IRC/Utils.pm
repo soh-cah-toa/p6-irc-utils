@@ -383,11 +383,11 @@ sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
     return $value;
 }
 
-sub eq_irc(Str $first, Str $second, Str $type) is export {
-    return if !$first.defined || !$second.defined;
+sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
+    return Bool::False if !$first.defined || !$second.defined;
 
-    return Bool::True if lc_irc($first, $type) ~~ lc_irc($second, $type);
-    return;
+    return Bool::True  if lc_irc($first, $type) eq lc_irc($second, $type);
+    return Bool::False;
 }
 
 # vim: ft=perl6

@@ -3,7 +3,7 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan 8;
+plan 9;
 
 # Test numeric_to_name()
 {
@@ -63,6 +63,15 @@ plan 8;
     my Str $lc_strict = lc_irc $nick, 'strict-rfc1459';
 
     is $lc_strict,  '{soh|cah|toa}', 'One arg lc_irc() with "strict-rfc1459"';
+}
+
+# Test eq_irc()
+{
+    my Str  $uc = '[S0H~C4H~T04]';
+    my Str  $lc = '{s0h~c4h~t04}';
+    my Bool $eq = eq_irc($uc, $lc);
+
+    ok $eq, 'eq_irc()';
 }
 
 done;
