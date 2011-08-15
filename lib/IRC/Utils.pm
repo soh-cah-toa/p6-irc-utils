@@ -345,15 +345,15 @@ sub name_to_numeric(Str $name) is export {
     return %NAME2NUMERIC<$name>;
 }
 
-sub uc_irc(Str $value, Str $type = 'rfc1459') is export {
+sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
     return if !$value.defined;
 
-    $type.=lc;
+    my $t = $type.lc;
 
-    if $type ~~ 'ascii' {
+    if $t ~~ 'ascii' {
         $value.=trans('a..z' => 'A..Z');
     }
-    elsif $type ~~ 'strict-rfc1459' {
+    elsif $t ~~ 'strict-rfc1459' {
         $value.=trans('a..z{}|' => 'A..Z[]\\');
     }
     else {
@@ -363,15 +363,15 @@ sub uc_irc(Str $value, Str $type = 'rfc1459') is export {
     return $value;
 }
 
-sub lc_irc(Str $value, Str $type = 'rfc1459') is export {
+sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
     return if !$value.defined;
 
-    $type.=lc;
+    my $t = $type.lc;
 
-    if $type ~~ 'ascii' {
+    if $t ~~ 'ascii' {
         $value.=trans('A..Z' => 'a..z');
     }
-    elsif $type ~~ 'strict-rfc1459' {
+    elsif $t ~~ 'strict-rfc1459' {
         $value.=trans('A..Z[]\\' => 'a..z{}|');
     }
     else {
