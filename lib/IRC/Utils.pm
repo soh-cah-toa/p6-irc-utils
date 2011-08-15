@@ -348,8 +348,6 @@ sub name_to_numeric(Str $name) is export {
 }
 
 sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
-    return if !$value.defined;
-
     my $t = $type.lc;
 
     if $t ~~ 'ascii' {
@@ -366,8 +364,6 @@ sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
 }
 
 sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
-    return if !$value.defined;
-
     my $t = $type.lc;
 
     if $t ~~ 'ascii' {
