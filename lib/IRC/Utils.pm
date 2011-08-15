@@ -375,7 +375,7 @@ sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
         $value.=trans('A..Z[]\\' => 'a..z{}|');
     }
     else {
-        $value.=trans('a..z[]\\~' => 'A..Z{}|^');
+        $value.=trans('A..Z[]\\~' => 'a..z{}|^');
     }
 
     return $value;
