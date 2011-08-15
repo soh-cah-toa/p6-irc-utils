@@ -15,10 +15,10 @@ plan 9;
 
 # Test name_to_numeric()
 {
-    my Str $rpl_user = 'RPL_USERS';
-    my Int $code     = name_to_numeric($rpl_user);
+    my Str $rpl_topic = 'RPL_TOPIC';
+    my Int $code      = name_to_numeric($rpl_topic);
 
-    is $code, 393, 'name_to_numeric()';
+    is $code, 332, 'name_to_numeric()';
 }
 
 # Test uc_irc()
