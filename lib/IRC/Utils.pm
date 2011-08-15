@@ -123,226 +123,228 @@ our $GREY        = "\x0314";
 our $LIGHT_GREY  = "\x0315";
  
 # Associates numeric codes with their string representation
-our %NAME2NUMERIC = (
-    :RPL_WELCOME(001),           # RFC2812
-    :RPL_YOURHOST(002),          # RFC2812
-    :RPL_CREATED(003),           # RFC2812
-    :RPL_MYINFO(004),            # RFC2812
-    :RPL_ISUPPORT(005),          # draft-brocklesby-irc-isupport-03
-    :RPL_SNOMASK(008),           # Undernet
-    :RPL_STATMEMTOT(009),        # Undernet
-    :RPL_STATMEM(010),           # Undernet
-    :RPL_CONNECTING(020),        # IRCnet
-    :RPL_YOURCOOKIE(014),        # IRCnet
-    :RPL_YOURID(042),            # IRCnet
-    :RPL_SAVENICK(043),          # IRCnet
-    :RPL_ATTEMPTINGJUNC(050),    # aircd
-    :RPL_ATTEMPTINGREROUTE(051), # aircd
-    :RPL_TRACELINK(200),         # RFC1459
-    :RPL_TRACECONNECTING(201),   # RFC1459
-    :RPL_TRACEHANDSHAKE(202),    # RFC1459
-    :RPL_TRACEUNKNOWN(203),      # RFC1459
-    :RPL_TRACEOPERATOR(204),     # RFC1459
-    :RPL_TRACEUSER(205),         # RFC1459
-    :RPL_TRACESERVER(206),       # RFC1459
-    :RPL_TRACESERVICE(207),      # RFC2812
-    :RPL_TRACENEWTYPE(208),      # RFC1459
-    :RPL_TRACECLASS(209),        # RFC2812
-    :RPL_STATS(210),             # aircd
-    :RPL_STATSLINKINFO(211),     # RFC1459
-    :RPL_STATSCOMMANDS(212),     # RFC1459
-    :RPL_STATSCLINE(213),        # RFC1459
-    :RPL_STATSNLINE(214),        # RFC1459
-    :RPL_STATSILINE(215),        # RFC1459
-    :RPL_STATSKLINE(216),        # RFC1459
-    :RPL_STATSQLINE(217),        # RFC1459
-    :RPL_STATSYLINE(218),        # RFC1459
-    :RPL_ENDOFSTATS(219),        # RFC1459
-    :RPL_UMODEIS(221),           # RFC1459
-    :RPL_SERVICEINFO(231),       # RFC1459
-    :RPL_SERVICE(233),           # RFC1459
-    :RPL_SERVLIST(234),          # RFC1459
-    :RPL_SERVLISTEND(235),       # RFC1459
-    :RPL_STATSIAUTH(239),        # IRCnet
-    :RPL_STATSLLINE(241),        # RFC1459
-    :RPL_STATSUPTIME(242),       # RFC1459
-    :RPL_STATSOLINE(243),        # RFC1459
-    :RPL_STATSHLINE(244),        # RFC1459
-    :RPL_STATSSLINE(245),        # Bahamut, IRCnet, Hybrid
-    :RPL_STATSCONN(250),         # ircu, Unreal
-    :RPL_LUSERCLIENT(251),       # RFC1459
-    :RPL_LUSEROP(252),           # RFC1459
-    :RPL_LUSERUNKNOWN(253),      # RFC1459
-    :RPL_LUSERCHANNELS(254),     # RFC1459
-    :RPL_LUSERME(255),           # RFC1459
-    :RPL_ADMINME(256),           # RFC1459
-    :RPL_ADMINLOC1(257),         # RFC1459
-    :RPL_ADMINLOC2(258),         # RFC1459
-    :RPL_ADMINEMAIL(259),        # RFC1459
-    :RPL_TRACELOG(261),          # RFC1459
-    :RPL_TRACEEND(262),          # RFC2812
-    :RPL_TRYAGAIN(263),          # RFC2812
-    :RPL_LOCALUSERS(265),        # aircd, Bahamut, Hybrid
-    :RPL_GLOBALUSERS(266),       # aircd, Bahamut, Hybrid
-    :RPL_START_NETSTAT(267),     # aircd
-    :RPL_NETSTAT(268),           # aircd
-    :RPL_END_NETSTAT(269),       # aircd
-    :RPL_PRIVS(270),             # ircu
-    :RPL_SILELIST(271),          # ircu
-    :RPL_ENDOFSILELIST(272),     # ircu
-    :RPL_NONE(300),              # RFC1459
-    :RPL_AWAY(301),              # RFC1459
-    :RPL_USERHOST(302),          # RFC1459
-    :RPL_ISON(303),              # RFC1459
-    :RPL_UNAWAY(305),            # RFC1459
-    :RPL_NOWAWAY(306),           # RFC1459
-    :RPL_WHOISREGNICK(307),      # Bahamut, Unreal, Plexus
-    :RPL_WHOISMODES(310),        # Plexus
-    :RPL_WHOISUSER(311),         # RFC1459
-    :RPL_WHOISSERVER(312),       # RFC1459
-    :RPL_WHOISOPERATOR(313),     # RFC1459
-    :RPL_WHOWASUSER(314),        # RFC1459
-    :RPL_ENDOFWHO(315),          # RFC1459
-    :RPL_WHOISIDLE(317),         # RFC1459
-    :RPL_ENDOFWHOIS(318),        # RFC1459
-    :RPL_WHOISCHANNELS(319),     # RFC1459
-    :RPL_LISTSTART(321),         # RFC1459
-    :RPL_LIST(322),              # RFC1459
-    :RPL_LISTEND(323),           # RFC1459
-    :RPL_CHANNELMODEIS(324),     # RFC1459
-    :RPL_UNIQOPIS(325),          # RFC2812
-    :RPL_CHANNEL_URL(328),       # Bahamut, AustHex
-    :RPL_CREATIONTIME(329),      # Bahamut
-    :RPL_WHOISACCOUNT(330),      # ircu
-    :RPL_NOTOPIC(331),           # RFC1459
-    :RPL_TOPIC(332),             # RFC1459
-    :RPL_TOPICWHOTIME(333),      # ircu
-    :RPL_WHOISACTUALLY(338),     # Bahamut, ircu
-    :RPL_USERIP(340),            # ircu
-    :RPL_INVITING(341),          # RFC1459
-    :RPL_SUMMONING(342),         # RFC1459
-    :RPL_INVITED(345),           # GameSurge
-    :RPL_INVITELIST(346),        # RFC2812
-    :RPL_ENDOFINVITELIST(347),   # RFC2812
-    :RPL_EXCEPTLIST(348),        # RFC2812
-    :RPL_ENDOFEXCEPTLIST(349),   # RFC2812
-    :RPL_VERSION(351),           # RFC1459
-    :RPL_WHOREPLY(352),          # RFC1459
-    :RPL_NAMREPLY(353),          # RFC1459
-    :RPL_WHOSPCRPL(354),         # ircu
-    :RPL_NAMREPLY_(355),         # QuakeNet
-    :RPL_KILLDONE(361),          # RFC1459
-    :RPL_CLOSING(362),           # RFC1459
-    :RPL_CLOSEEND(363),          # RFC1459
-    :RPL_LINKS(364),             # RFC1459
-    :RPL_ENDOFLINKS(365),        # RFC1459
-    :RPL_ENDOFNAMES(366),        # RFC1459
-    :RPL_BANLIST(367),           # RFC1459
-    :RPL_ENDOFBANLIST(368),      # RFC1459
-    :RPL_ENDOFWHOWAS(369),       # RFC1459
-    :RPL_INFO(371),              # RFC1459
-    :RPL_MOTD(372),              # RFC1459
-    :RPL_INFOSTART(373),         # RFC1459
-    :RPL_ENDOFINFO(374),         # RFC1459
-    :RPL_MOTDSTART(375),         # RFC1459
-    :RPL_ENDOFMOTD(376),         # RFC1459
-    :RPL_YOUREOPER(381),         # RFC1459
-    :RPL_REHASHING(382),         # RFC1459
-    :RPL_YOURESERVICE(383),      # RFC2812
-    :RPL_MYPORTIS(384),          # RFC1459
-    :RPL_NOTOPERANYMORE(385),    # AustHex, Hybrid, Unreal
-    :RPL_TIME(391),              # RFC1459
-    :RPL_USERSSTART(392),        # RFC1459
-    :RPL_USERS(393),             # RFC1459
-    :RPL_ENDOFUSERS(394),        # RFC1459
-    :RPL_NOUSERS(395),           # RFC1459
-    :RPL_HOSTHIDDEN(396),        # Undernet
-    :ERR_NOSUCHNICK(401),        # RFC1459
-    :ERR_NOSUCHSERVER(402),      # RFC1459
-    :ERR_NOSUCHCHANNEL(403),     # RFC1459
-    :ERR_CANNOTSENDTOCHAN(404),  # RFC1459
-    :ERR_TOOMANYCHANNELS(405),   # RFC1459
-    :ERR_WASNOSUCHNICK(406),     # RFC1459
-    :ERR_TOOMANYTARGETS(407),    # RFC1459
-    :ERR_NOSUCHSERVICE(408),     # RFC2812
-    :ERR_NOORIGIN(409),          # RFC1459
-    :ERR_NORECIPIENT(411),       # RFC1459
-    :ERR_NOTEXTTOSEND(412),      # RFC1459
-    :ERR_NOTOPLEVEL(413),        # RFC1459
-    :ERR_WILDTOPLEVEL(414),      # RFC1459
-    :ERR_BADMASK(415),           # RFC2812
-    :ERR_UNKNOWNCOMMAND(421),    # RFC1459
-    :ERR_NOMOTD(422),            # RFC1459
-    :ERR_NOADMININFO(423),       # RFC1459
-    :ERR_FILEERROR(424),         # RFC1459
-    :ERR_NOOPERMOTD(425),        # Unreal
-    :ERR_TOOMANYAWAY(429),       # Bahamut
-    :ERR_EVENTNICKCHANGE(430),   # AustHex
-    :ERR_NONICKNAMEGIVEN(431),   # RFC1459
-    :ERR_ERRONEUSNICKNAME(432),  # RFC1459
-    :ERR_NICKNAMEINUSE(433),     # RFC1459
-    :ERR_NICKCOLLISION(436),     # RFC1459
-    :ERR_TARGETTOOFAST(439),     # ircu
-    :ERR_SERCVICESDOWN(440),     # Bahamut, Unreal
-    :ERR_USERNOTINCHANNEL(441),  # RFC1459
-    :ERR_NOTONCHANNEL(442),      # RFC1459
-    :ERR_USERONCHANNEL(443),     # RFC1459
-    :ERR_NOLOGIN(444),           # RFC1459
-    :ERR_SUMMONDISABLED(445),    # RFC1459
-    :ERR_USERSDISABLED(446),     # RFC1459
-    :ERR_NONICKCHANGE(447),      # Unreal
-    :ERR_NOTIMPLEMENTED(449),    # Undernet
-    :ERR_NOTREGISTERED(451),     # RFC1459
-    :ERR_HOSTILENAME(455),       # Unreal
-    :ERR_NOHIDING(459),          # Unreal
-    :ERR_NOTFORHALFOPS(460),     # Unreal
-    :ERR_NEEDMOREPARAMS(461),    # RFC1459
-    :ERR_ALREADYREGISTRED(462),  # RFC1459
-    :ERR_NOPERMFORHOST(463),     # RFC1459
-    :ERR_PASSWDMISMATCH(464),    # RFC1459
-    :ERR_YOUREBANNEDCREEP(465),  # RFC1459
-    :ERR_YOUWILLBEBANNED(466),   # RFC1459
-    :ERR_KEYSET(467),            # RFC1459
-    :ERR_LINKSET(469),           # Unreal
-    :ERR_CHANNELISFULL(471),     # RFC1459
-    :ERR_UNKNOWNMODE(472),       # RFC1459
-    :ERR_INVITEONLYCHAN(473),    # RFC1459
-    :ERR_BANNEDFROMCHAN(474),    # RFC1459
-    :ERR_BADCHANNELKEY(475),     # RFC1459
-    :ERR_BADCHANMASK(476),       # RFC2812
-    :ERR_NOCHANMODES(477),       # RFC2812
-    :ERR_BANLISTFULL(478),       # RFC2812
-    :ERR_NOPRIVILEGES(481),      # RFC1459
-    :ERR_CHANOPRIVSNEEDED(482),  # RFC1459
-    :ERR_CANTKILLSERVER(483),    # RFC1459
-    :ERR_RESTRICTED(484),        # RFC2812
-    :ERR_UNIQOPPRIVSNEEDED(485), # RFC2812
-    :ERR_TSLESSCHAN(488),        # IRCnet
-    :ERR_NOOPERHOST(491),        # RFC1459
-    :ERR_NOSERVICEHOST(492),     # RFC1459
-    :ERR_NOFEATURE(493),         # ircu
-    :ERR_BADFEATURE(494),        # ircu
-    :ERR_BADLOGTYPE(495),        # ircu
-    :ERR_BADLOGSYS(496),         # ircu
-    :ERR_BADLOGVALUE(497),       # ircu
-    :ERR_ISOPERLCHAN(498),       # ircu
-    :ERR_UMODEUNKNOWNFLAG(501),  # RFC1459
-    :ERR_USERSDONTMATCH(502),    # RFC1459
-    :ERR_GHOSTEDCLIENT(503)      # Hybrid
-);
+our %NUMERIC2NAME =
+   001 => 'RPL_WELCOME',           # RFC2812
+   002 => 'RPL_YOURHOST',          # RFC2812
+   003 => 'RPL_CREATED',           # RFC2812
+   004 => 'RPL_MYINFO',            # RFC2812
+   005 => 'RPL_ISUPPORT',          # draft-brocklesby-irc-isupport-03
+   008 => 'RPL_SNOMASK',           # Undernet
+   009 => 'RPL_STATMEMTOT',        # Undernet
+   010 => 'RPL_STATMEM',           # Undernet
+   020 => 'RPL_CONNECTING',        # IRCnet
+   014 => 'RPL_YOURCOOKIE',        # IRCnet
+   042 => 'RPL_YOURID',            # IRCnet
+   043 => 'RPL_SAVENICK',          # IRCnet
+   050 => 'RPL_ATTEMPTINGJUNC',    # aircd
+   051 => 'RPL_ATTEMPTINGREROUTE', # aircd
+   200 => 'RPL_TRACELINK',         # RFC1459
+   201 => 'RPL_TRACECONNECTING',   # RFC1459
+   202 => 'RPL_TRACEHANDSHAKE',    # RFC1459
+   203 => 'RPL_TRACEUNKNOWN',      # RFC1459
+   204 => 'RPL_TRACEOPERATOR',     # RFC1459
+   205 => 'RPL_TRACEUSER',         # RFC1459
+   206 => 'RPL_TRACESERVER',       # RFC1459
+   207 => 'RPL_TRACESERVICE',      # RFC2812
+   208 => 'RPL_TRACENEWTYPE',      # RFC1459
+   209 => 'RPL_TRACECLASS',        # RFC2812
+   210 => 'RPL_STATS',             # aircd
+   211 => 'RPL_STATSLINKINFO',     # RFC1459
+   212 => 'RPL_STATSCOMMANDS',     # RFC1459
+   213 => 'RPL_STATSCLINE',        # RFC1459
+   214 => 'RPL_STATSNLINE',        # RFC1459
+   215 => 'RPL_STATSILINE',        # RFC1459
+   216 => 'RPL_STATSKLINE',        # RFC1459
+   217 => 'RPL_STATSQLINE',        # RFC1459
+   218 => 'RPL_STATSYLINE',        # RFC1459
+   219 => 'RPL_ENDOFSTATS',        # RFC1459
+   221 => 'RPL_UMODEIS',           # RFC1459
+   231 => 'RPL_SERVICEINFO',       # RFC1459
+   233 => 'RPL_SERVICE',           # RFC1459
+   234 => 'RPL_SERVLIST',          # RFC1459
+   235 => 'RPL_SERVLISTEND',       # RFC1459
+   239 => 'RPL_STATSIAUTH',        # IRCnet
+   241 => 'RPL_STATSLLINE',        # RFC1459
+   242 => 'RPL_STATSUPTIME',       # RFC1459
+   243 => 'RPL_STATSOLINE',        # RFC1459
+   244 => 'RPL_STATSHLINE',        # RFC1459
+   245 => 'RPL_STATSSLINE',        # Bahamut, IRCnet, Hybrid
+   250 => 'RPL_STATSCONN',         # ircu, Unreal
+   251 => 'RPL_LUSERCLIENT',       # RFC1459
+   252 => 'RPL_LUSEROP',           # RFC1459
+   253 => 'RPL_LUSERUNKNOWN',      # RFC1459
+   254 => 'RPL_LUSERCHANNELS',     # RFC1459
+   255 => 'RPL_LUSERME',           # RFC1459
+   256 => 'RPL_ADMINME',           # RFC1459
+   257 => 'RPL_ADMINLOC1',         # RFC1459
+   258 => 'RPL_ADMINLOC2',         # RFC1459
+   259 => 'RPL_ADMINEMAIL',        # RFC1459
+   261 => 'RPL_TRACELOG',          # RFC1459
+   262 => 'RPL_TRACEEND',          # RFC2812
+   263 => 'RPL_TRYAGAIN',          # RFC2812
+   265 => 'RPL_LOCALUSERS',        # aircd, Bahamut, Hybrid
+   266 => 'RPL_GLOBALUSERS',       # aircd, Bahamut, Hybrid
+   267 => 'RPL_START_NETSTAT',     # aircd
+   268 => 'RPL_NETSTAT',           # aircd
+   269 => 'RPL_END_NETSTAT',       # aircd
+   270 => 'RPL_PRIVS',             # ircu
+   271 => 'RPL_SILELIST',          # ircu
+   272 => 'RPL_ENDOFSILELIST',     # ircu
+   300 => 'RPL_NONE',              # RFC1459
+   301 => 'RPL_AWAY',              # RFC1459
+   302 => 'RPL_USERHOST',          # RFC1459
+   303 => 'RPL_ISON',              # RFC1459
+   305 => 'RPL_UNAWAY',            # RFC1459
+   306 => 'RPL_NOWAWAY',           # RFC1459
+   307 => 'RPL_WHOISREGNICK',      # Bahamut, Unreal, Plexus
+   310 => 'RPL_WHOISMODES',        # Plexus
+   311 => 'RPL_WHOISUSER',         # RFC1459
+   312 => 'RPL_WHOISSERVER',       # RFC1459
+   313 => 'RPL_WHOISOPERATOR',     # RFC1459
+   314 => 'RPL_WHOWASUSER',        # RFC1459
+   315 => 'RPL_ENDOFWHO',          # RFC1459
+   317 => 'RPL_WHOISIDLE',         # RFC1459
+   318 => 'RPL_ENDOFWHOIS',        # RFC1459
+   319 => 'RPL_WHOISCHANNELS',     # RFC1459
+   321 => 'RPL_LISTSTART',         # RFC1459
+   322 => 'RPL_LIST',              # RFC1459
+   323 => 'RPL_LISTEND',           # RFC1459
+   324 => 'RPL_CHANNELMODEIS',     # RFC1459
+   325 => 'RPL_UNIQOPIS',          # RFC2812
+   328 => 'RPL_CHANNEL_URL',       # Bahamut, AustHex
+   329 => 'RPL_CREATIONTIME',      # Bahamut
+   330 => 'RPL_WHOISACCOUNT',      # ircu
+   331 => 'RPL_NOTOPIC',           # RFC1459
+   332 => 'RPL_TOPIC',             # RFC1459
+   333 => 'RPL_TOPICWHOTIME',      # ircu
+   338 => 'RPL_WHOISACTUALLY',     # Bahamut, ircu
+   340 => 'RPL_USERIP',            # ircu
+   341 => 'RPL_INVITING',          # RFC1459
+   342 => 'RPL_SUMMONING',         # RFC1459
+   345 => 'RPL_INVITED',           # GameSurge
+   346 => 'RPL_INVITELIST',        # RFC2812
+   347 => 'RPL_ENDOFINVITELIST',   # RFC2812
+   348 => 'RPL_EXCEPTLIST',        # RFC2812
+   349 => 'RPL_ENDOFEXCEPTLIST',   # RFC2812
+   351 => 'RPL_VERSION',           # RFC1459
+   352 => 'RPL_WHOREPLY',          # RFC1459
+   353 => 'RPL_NAMREPLY',          # RFC1459
+   354 => 'RPL_WHOSPCRPL',         # ircu
+   355 => 'RPL_NAMREPLY_',         # QuakeNet
+   361 => 'RPL_KILLDONE',          # RFC1459
+   362 => 'RPL_CLOSING',           # RFC1459
+   363 => 'RPL_CLOSEEND',          # RFC1459
+   364 => 'RPL_LINKS',             # RFC1459
+   365 => 'RPL_ENDOFLINKS',        # RFC1459
+   366 => 'RPL_ENDOFNAMES',        # RFC1459
+   367 => 'RPL_BANLIST',           # RFC1459
+   368 => 'RPL_ENDOFBANLIST',      # RFC1459
+   369 => 'RPL_ENDOFWHOWAS',       # RFC1459
+   371 => 'RPL_INFO',              # RFC1459
+   372 => 'RPL_MOTD',              # RFC1459
+   373 => 'RPL_INFOSTART',         # RFC1459
+   374 => 'RPL_ENDOFINFO',         # RFC1459
+   375 => 'RPL_MOTDSTART',         # RFC1459
+   376 => 'RPL_ENDOFMOTD',         # RFC1459
+   381 => 'RPL_YOUREOPER',         # RFC1459
+   382 => 'RPL_REHASHING',         # RFC1459
+   383 => 'RPL_YOURESERVICE',      # RFC2812
+   384 => 'RPL_MYPORTIS',          # RFC1459
+   385 => 'RPL_NOTOPERANYMORE',    # AustHex, Hybrid, Unreal
+   391 => 'RPL_TIME',              # RFC1459
+   392 => 'RPL_USERSSTART',        # RFC1459
+   393 => 'RPL_USERS',             # RFC1459
+   394 => 'RPL_ENDOFUSERS',        # RFC1459
+   395 => 'RPL_NOUSERS',           # RFC1459
+   396 => 'RPL_HOSTHIDDEN',        # Undernet
+   401 => 'ERR_NOSUCHNICK',        # RFC1459
+   402 => 'ERR_NOSUCHSERVER',      # RFC1459
+   403 => 'ERR_NOSUCHCHANNEL',     # RFC1459
+   404 => 'ERR_CANNOTSENDTOCHAN',  # RFC1459
+   405 => 'ERR_TOOMANYCHANNELS',   # RFC1459
+   406 => 'ERR_WASNOSUCHNICK',     # RFC1459
+   407 => 'ERR_TOOMANYTARGETS',    # RFC1459
+   408 => 'ERR_NOSUCHSERVICE',     # RFC2812
+   409 => 'ERR_NOORIGIN',          # RFC1459
+   411 => 'ERR_NORECIPIENT',       # RFC1459
+   412 => 'ERR_NOTEXTTOSEND',      # RFC1459
+   413 => 'ERR_NOTOPLEVEL',        # RFC1459
+   414 => 'ERR_WILDTOPLEVEL',      # RFC1459
+   415 => 'ERR_BADMASK',           # RFC2812
+   421 => 'ERR_UNKNOWNCOMMAND',    # RFC1459
+   422 => 'ERR_NOMOTD',            # RFC1459
+   423 => 'ERR_NOADMININFO',       # RFC1459
+   424 => 'ERR_FILEERROR',         # RFC1459
+   425 => 'ERR_NOOPERMOTD',        # Unreal
+   429 => 'ERR_TOOMANYAWAY',       # Bahamut
+   430 => 'ERR_EVENTNICKCHANGE',   # AustHex
+   431 => 'ERR_NONICKNAMEGIVEN',   # RFC1459
+   432 => 'ERR_ERRONEUSNICKNAME',  # RFC1459
+   433 => 'ERR_NICKNAMEINUSE',     # RFC1459
+   436 => 'ERR_NICKCOLLISION',     # RFC1459
+   439 => 'ERR_TARGETTOOFAST',     # ircu
+   440 => 'ERR_SERCVICESDOWN',     # Bahamut, Unreal
+   441 => 'ERR_USERNOTINCHANNEL',  # RFC1459
+   442 => 'ERR_NOTONCHANNEL',      # RFC1459
+   443 => 'ERR_USERONCHANNEL',     # RFC1459
+   444 => 'ERR_NOLOGIN',           # RFC1459
+   445 => 'ERR_SUMMONDISABLED',    # RFC1459
+   446 => 'ERR_USERSDISABLED',     # RFC1459
+   447 => 'ERR_NONICKCHANGE',      # Unreal
+   449 => 'ERR_NOTIMPLEMENTED',    # Undernet
+   451 => 'ERR_NOTREGISTERED',     # RFC1459
+   455 => 'ERR_HOSTILENAME',       # Unreal
+   459 => 'ERR_NOHIDING',          # Unreal
+   460 => 'ERR_NOTFORHALFOPS',     # Unreal
+   461 => 'ERR_NEEDMOREPARAMS',    # RFC1459
+   462 => 'ERR_ALREADYREGISTRED',  # RFC1459
+   463 => 'ERR_NOPERMFORHOST',     # RFC1459
+   464 => 'ERR_PASSWDMISMATCH',    # RFC1459
+   465 => 'ERR_YOUREBANNEDCREEP',  # RFC1459
+   466 => 'ERR_YOUWILLBEBANNED',   # RFC1459
+   467 => 'ERR_KEYSET',            # RFC1459
+   469 => 'ERR_LINKSET',           # Unreal
+   471 => 'ERR_CHANNELISFULL',     # RFC1459
+   472 => 'ERR_UNKNOWNMODE',       # RFC1459
+   473 => 'ERR_INVITEONLYCHAN',    # RFC1459
+   474 => 'ERR_BANNEDFROMCHAN',    # RFC1459
+   475 => 'ERR_BADCHANNELKEY',     # RFC1459
+   476 => 'ERR_BADCHANMASK',       # RFC2812
+   477 => 'ERR_NOCHANMODES',       # RFC2812
+   478 => 'ERR_BANLISTFULL',       # RFC2812
+   481 => 'ERR_NOPRIVILEGES',      # RFC1459
+   482 => 'ERR_CHANOPRIVSNEEDED',  # RFC1459
+   483 => 'ERR_CANTKILLSERVER',    # RFC1459
+   484 => 'ERR_RESTRICTED',        # RFC2812
+   485 => 'ERR_UNIQOPPRIVSNEEDED', # RFC2812
+   488 => 'ERR_TSLESSCHAN',        # IRCnet
+   491 => 'ERR_NOOPERHOST',        # RFC1459
+   492 => 'ERR_NOSERVICEHOST',     # RFC1459
+   493 => 'ERR_NOFEATURE',         # ircu
+   494 => 'ERR_BADFEATURE',        # ircu
+   495 => 'ERR_BADLOGTYPE',        # ircu
+   496 => 'ERR_BADLOGSYS',         # ircu
+   497 => 'ERR_BADLOGVALUE',       # ircu
+   498 => 'ERR_ISOPERLCHAN',       # ircu
+   501 => 'ERR_UMODEUNKNOWNFLAG',  # RFC1459
+   502 => 'ERR_USERSDONTMATCH',    # RFC1459
+   503 => 'ERR_GHOSTEDCLIENT';     # Hybrid
 
-our %NUMERIC2NAME;
+our %NAME2NUMERIC;
 
-for %NAME2NUMERIC.kv -> $key, $val {
-    %NUMERIC2NAME<$val> = $key;
+{
+    my Int @keys = %NUMERIC2NAME.keys;
+    my Str @vals = %NUMERIC2NAME.values;
+
+    %NAME2NUMERIC = @vals Z @keys;
 }
 
 sub numeric_to_name(Int $code) is export {
-    return %NUMERIC2NAME<$code>;
+    return %NUMERIC2NAME{$code};
 }
 
 sub name_to_numeric(Str $name) is export {
-    return %NAME2NUMERIC<$name>;
+    return %NAME2NUMERIC{$name}.Int;
 }
 
 sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {

@@ -3,7 +3,23 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan 6;
+plan 8;
+
+# Test numeric_to_name()
+{
+    my Int $code      = 332;
+    my Str $rpl_topic = numeric_to_name($code);
+
+    is $rpl_topic, 'RPL_TOPIC', 'numeric_to_name()';
+}
+
+# Test name_to_numeric()
+{
+    my Str $rpl_user = 'RPL_USERS';
+    my Int $code     = name_to_numeric($rpl_user);
+
+    is $code, 393, 'name_to_numeric()';
+}
 
 # Test uc_irc()
 {
