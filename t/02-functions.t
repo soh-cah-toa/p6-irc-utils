@@ -3,7 +3,7 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan 9;
+plan 15;
 
 # Test numeric_to_name()
 {
@@ -72,6 +72,50 @@ plan 9;
     my Bool $eq = eq_irc($uc, $lc);
 
     ok $eq, 'eq_irc()';
+}
+
+# Test is_valid_nick_name()
+{
+    my Str  $nick  = '{soh_cah_toa}';
+    my Bool $valid = is_valid_nick_name($nick);
+
+    ok $valid, 'is_valid_nick_name() with valid nickname';
+}
+
+{
+    my Str  $nick  = '{soh=cah=toa}';
+    my Bool $valid = is_valid_nick_name($nick);
+
+    nok $valid, 'is_valid_nick_name() with invalid nickname';
+}
+
+# Test is_valid_chan_name()
+{
+    my Str  $chan  = '#foobar';
+    my Bool $valid = is_valid_chan_name($chan);
+
+    ok $valid, 'One arg is_valid_chan_name() with valid channel';
+}
+
+{
+    my Str  $chan  = '#foo:bar';
+    my Bool $valid = is_valid_chan_name($chan);
+
+    nok $valid, 'One arg is_valid_chan_name() with invalid channel';
+}
+
+{
+    my Str  $chan  = 'foobar';
+    my Bool $valid = is_valid_chan_name($chan, ['&']);
+
+    ok $valid, 'Two arg is_valid_chan_name() with valid channel';
+}
+
+{
+    my Str  $chan  = '#foo:bar';
+    my Bool $valid = is_valid_chan_name($chan, ['#', '%']);
+
+    nok $valid, 'Two arg is_valid_chan_name() with invalid channel';
 }
 
 done;

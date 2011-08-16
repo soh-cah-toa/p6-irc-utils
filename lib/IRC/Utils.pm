@@ -19,6 +19,11 @@ IRC::Utils - useful utilities for use in other IRC-related modules
         say "These nicknames are the same!";
     }
 
+    # Check if nickname conforms to RFC1459
+    if is_valid_nick_name($nick) {
+        say "Nickname is valid!";
+    }
+
 =head1 DESCRIPTION
 
 The C<IRC::Utils> module provides a procedural interface for performing many
@@ -89,6 +94,29 @@ The C<$name> parameter is a string representing the reply or error code. For
 instance, C<ERR_NEEDMOREPARAMS> is 461.
 
 Returns the numerical representation of C<$name>.
+
+=head2 B<is_valid_nick_name(Str $nick)>
+
+Checks if a nickname is valid. That is, it conforms to the allowable
+characters defined in RFC 1459.
+
+The C<$nick> parameter is a string representing the nickname to check.
+
+Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
+otherwise.
+
+=head2 B<is_valid_chan_name(Str $chan, Str @types)>
+
+Checks if a channel name is valid. That is, it conforms to the allowable
+characters defined in RFC 1459.
+
+The C<$chan> parameter is a string representing the channel name to check.
+
+The C<@types> parameter is optional and is an anonymous list of channel types.
+For instance, '#'. Defaults to C<['#', '&']>.
+
+Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
+otherwise.
 
 =end Pod
 
@@ -330,11 +358,12 @@ our %NUMERIC2NAME =
    502 => 'ERR_USERSDONTMATCH',    # RFC1459
    503 => 'ERR_GHOSTEDCLIENT';     # Hybrid
 
+# Associates string representation with their numeric codes
 our %NAME2NUMERIC;
 
 {
-    my Int @keys = %NUMERIC2NAME.keys;
-    my Str @vals = %NUMERIC2NAME.values;
+    my Int @keys  = %NUMERIC2NAME.keys;
+    my Str @vals  = %NUMERIC2NAME.values;
 
     %NAME2NUMERIC = @vals Z @keys;
 }
@@ -384,6 +413,34 @@ sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
 
     return Bool::True  if lc_irc($first, $type) eq lc_irc($second, $type);
     return Bool::False;
+}
+
+sub is_valid_nick_name(Str $nick) is export {
+    #my regex complex {  _ \` \- \^ \| \\ \{\} \[\] };
+    #my regex complex { '_' '`' '-' '|' '\\' '{' '}' '[' ']' };
+
+    # TODO Get 'complex' regex to interpolate properly to reduce duplication
+    # TODO Add backslash to regex
+
+    return Bool::True if $nick
+        ~~ /^ <[A..Z a..z      _ \- ` ^ | \{\} \[\]]>
+              <[A..Z a..z 0..9 _ \- ` ^ | \{\} \[\]]>* $/;
+
+    return Bool::False;
+}
+
+sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
+    return Bool::False if $types.chars == 0;
+    return Bool::False if $chan.bytes  >  200;
+    return Bool::False if $types ~~ /^ <-['#' '&']> $/;
+
+    for $types -> $t {
+        my $c = $t ~ $chan;
+
+        return Bool::False if $c !~~ /^ $t <-[<.ws> \07 \0 \012 \015 , :]>+ $/;
+    }
+
+    return Bool::True;
 }
 
 # vim: ft=perl6
