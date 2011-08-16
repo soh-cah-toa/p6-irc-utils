@@ -118,6 +118,17 @@ For instance, '#'. Defaults to C<['#', '&']>.
 Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
 otherwise.
 
+=head2 B<parse_user(Str $user)>
+
+Parses a username and splits it into the parts representing the nickname,
+username, and hostname.
+
+The C<$user> parameter is a string representing the fully qualified username to
+parse. It must be of the form C<nick!user@host>.
+
+Returns a list containing the nickname, username, and hostname parts of
+C<$user>.
+
 =end Pod
 
 module IRC::Utils;
@@ -441,6 +452,10 @@ sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
     }
 
     return Bool::True;
+}
+
+sub parse_user(Str $user) is export {
+    return $user.split(/<[!@]>/);
 }
 
 # vim: ft=perl6

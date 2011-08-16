@@ -3,7 +3,7 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan 15;
+plan 18;
 
 # Test numeric_to_name()
 {
@@ -116,6 +116,16 @@ plan 15;
     my Bool $valid = is_valid_chan_name($chan, ['#', '%']);
 
     nok $valid, 'Two arg is_valid_chan_name() with invalid channel';
+}
+
+# Test parse_user()
+{
+    my Str $fqn                  = 'foo!bar@baz.net';
+    my Str ($nick, $user, $host) = parse_user($fqn);
+
+    is $nick, 'foo',     'Check parse_user() nickname';
+    is $user, 'bar',     'Check parse_user() username';
+    is $host, 'baz.net', 'Check parse_user() hostname';
 }
 
 done;
