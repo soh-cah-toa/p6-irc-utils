@@ -3,8 +3,7 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan *;
-#plan 18;
+plan 25;
 
 # Test numeric_to_name()
 {
@@ -157,6 +156,29 @@ plan *;
     my $has_fmt    = has_formatting($normal_msg);
 
     ok $has_fmt, 'Check has_formatting() with normal text';
+}
+
+# Test strip_color()
+{
+    my Str $bg_color = "\x03,05Look at the pretty background colors!\x03";
+    my Str $fg_color = "\x0305Look at the pretty foreground colors!\x03";
+
+    my Str $bg_strip = strip_color($bg_color);
+    my Str $fg_strip = strip_color($fg_color);
+
+    is $bg_strip, 'Look at the pretty background colors!',
+                  'Check strip_color() with colored background';
+
+    is $fg_strip, 'Look at the pretty foreground colors!',
+                  'Check strip_color() with colored foreground';
+}
+
+{
+    my Str $normal_msg  = "Aw, I'm just a plain old boring message";
+    my Str $strip       = strip_color($normal_msg);
+
+    is $strip, "Aw, I'm just a plain old boring message",
+               'Check strip_color() with normal message';
 }
 
 done;

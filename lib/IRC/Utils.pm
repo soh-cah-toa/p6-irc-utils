@@ -147,6 +147,14 @@ The C<$string> parameter is the string to check.
 Returns C<Bool::True> is C<$string> contains any formatting codes and
 C<Bool::False> otherwise.
 
+=head2 B<strip_color(Str $string)>
+
+Strips a string of all embedded color codes.
+
+The C<$string> parameter is the string to strip.
+
+Returns the string in C<$string> with all embedded color codes removed.
+
 =end Pod
 
 module IRC::Utils;
@@ -458,6 +466,9 @@ sub is_valid_nick_name(Str $nick) is export {
     return Bool::False;
 }
 
+# TODO Modify this to take just one arg and move #/& check into one regex b/c
+#      even though this is how the Perl 5 IRC::Utils works, I don't like it
+
 sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
     return Bool::False if $types.chars == 0;
     return Bool::False if $chan.bytes  >  200;
@@ -466,6 +477,7 @@ sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
     for $types -> $t {
         my $c = $t ~ $chan;
 
+        # Channels can't contain whitespace, commas, colons, null, or newlines
         return Bool::False if $c !~~ /^ $t <-[<.ws> \07 \0 \012 \015 , :]>+ $/;
     }
 
@@ -484,6 +496,22 @@ sub has_color(Str $string) is export {
 sub has_formatting(Str $string) is export {
     return Bool::True if $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/;
     return Bool::False;
+}
+
+sub strip_color(Str $string is copy) is export {
+    # Strip mIRC colors
+    $string ~~ s:g/\x03 [\, \d**1..2 | \d**1..2 [\, \d**1..2]?]?//;
+
+    # Strip other colors supported by certain clients
+    $string ~~ s:g:i/\x04 <[0..9 a..f A..F]>**0..6//;
+
+    # Strip ANSI escape codes
+    $string ~~ s:g/\x1b \[ .*? <[\x00..\x1f \x40..\x7e]>//;
+
+    # Strip terminating \x0f but not for formatting codes
+    $string ~~ s:g/\x0f// if !has_formatting($string);
+
+    return $string;
 }
 
 # vim: ft=perl6
