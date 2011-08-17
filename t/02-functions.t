@@ -3,7 +3,8 @@ use v6;
 use Test;
 use IRC::Utils;
 
-plan 18;
+plan *;
+#plan 18;
 
 # Test numeric_to_name()
 {
@@ -126,6 +127,36 @@ plan 18;
     is $nick, 'foo',     'Check parse_user() nickname';
     is $user, 'bar',     'Check parse_user() username';
     is $host, 'baz.net', 'Check parse_user() hostname';
+}
+
+# Test has_color()
+{
+    my Str  $color_msg = "\x0304,05This is a colored message\x03";
+    my Bool $has_color = has_color($color_msg);
+
+    ok $has_color, 'Check has_color() with colored message';
+}
+
+{
+    my Str  $normal_msg = 'This is a normal message';
+    my Bool $has_color  = has_color($normal_msg);
+
+    nok $has_color, 'Check has_color() with normal message';
+}
+
+# Test has_formatting()
+{
+    my $fmt_msg = "This message has \x1funderlined\x0f text";
+    my $has_fmt = has_formatting($fmt_msg);
+
+    ok $has_fmt, 'Check has_formatting() with formatted text';
+}
+
+{
+    my $normal_msg = 'This message has no formatted text';
+    my $has_fmt    = has_formatting($normal_msg);
+
+    ok $has_fmt, 'Check has_formatting() with normal text';
 }
 
 done;

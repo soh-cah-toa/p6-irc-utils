@@ -129,6 +129,24 @@ parse. It must be of the form C<nick!user@host>.
 Returns a list containing the nickname, username, and hostname parts of
 C<$user>.
 
+=head2 B<has_color(Str $string)>
+
+Checks if a string contains any color codes.
+
+The C<$string> parameter is the string to check.
+
+Returns C<Bool::True> if C<$string> contains any color codes and C<Bool::False>
+otherwise.
+
+=head2 B<has_formatting(Str $string)>
+
+Checks if a string contains any formatting codes.
+
+The C<$string> parameter is the string to check.
+
+Returns C<Bool::True> is C<$string> contains any formatting codes and
+C<Bool::False> otherwise.
+
 =end Pod
 
 module IRC::Utils;
@@ -456,6 +474,16 @@ sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
 
 sub parse_user(Str $user) is export {
     return $user.split(/<[!@]>/);
+}
+
+sub has_color(Str $string) is export {
+    return Bool::True if $string ~~ /<[\x03 \x04 \x1b]>/;
+    return Bool::False;
+}
+
+sub has_formatting(Str $string) is export {
+    return Bool::True if $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/;
+    return Bool::False;
 }
 
 # vim: ft=perl6
