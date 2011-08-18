@@ -1,3 +1,16 @@
+2011-08-18  Kevin Polulak  <kpolulak@gmail.com>
+	* Released 0.0.3
+	New subroutines
+		- has_color()
+		- has_formatting()
+		- normalize_mask()
+		- strip_color()
+		- strip_formatting()
+	Subroutine strip_formatting() is a little buggy with no tests
+	More documentation
+	Better test coverage
+	All tests pass with 1 todo
+
 2011-08-15  Kevin Polulak  <kpolulak@gmail.com>
 	* Released 0.0.2
 	Added name_to_numeric() and numeric_to_name()
