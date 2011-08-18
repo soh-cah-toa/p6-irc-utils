@@ -10,7 +10,7 @@ IRC::Utils - useful utilities for use in other IRC-related modules
 
     use IRC::Utils;
 
-    my Str $nick    = '^Lame|BOT[moo]';
+    my Str $nick    = '[foo]^BAR^[baz]';
     my Str $uc_nick = uc_irc($nick);
     my Str $lc_nick = lc_irc($nick);
 
@@ -74,6 +74,14 @@ The C<$type> parameter is optional and represents the casemapping. It can be
 
 Returns C<Bool::True> if the nicknames are equivalent and C<Bool::False>
 otherwise.
+
+=head2 B<normalize_mask(@str)>
+
+Fully qualifies or "normalizes" a host/server mask.
+
+The C<@str> argument is a string representing a host/server mask.
+
+Returns C<@str> as a fully qualified mask.
 
 =head2 B<numeric_to_name(Int $code)>
 
@@ -153,14 +161,28 @@ Strips a string of all embedded color codes.
 
 The C<$string> parameter is the string to strip.
 
-Returns the string in C<$string> with all embedded color codes removed.
+Returns the string given in C<$string> with all embedded color codes removed.
+If the given string does not contain any color codes, the original string is
+returned as is.
+
+=head2 B<strip_formatting(Str $string)>
+
+Strips a string of all embedded text format codes.
+
+The C<$string> parameter is the string to strip.
+
+Returns the string given in C<$string> with all embedded text format codes
+removed. If the given string does not contain any text formatting codes, the
+original string is returned as is.
 
 =end Pod
+
+=cut
 
 module IRC::Utils;
 
 our $NORMAL      = "\x0f";
- 
+
 # Text formats
 our $BOLD        = "\x02";
 our $UNDERLINE   = "\x1f";
@@ -168,7 +190,7 @@ our $REVERSE     = "\x16";
 our $ITALIC      = "\x1d";
 our $FIXED       = "\x11";
 our $BLINK       = "\x06";
- 
+
 # Color formats
 our $WHITE       = "\x0300";
 our $BLACK       = "\x0301";
@@ -186,7 +208,7 @@ our $LIGHT_BLUE  = "\x0312";
 our $PINK        = "\x0313";
 our $GREY        = "\x0314";
 our $LIGHT_GREY  = "\x0315";
- 
+
 # Associates numeric codes with their string representation
 our %NUMERIC2NAME =
    001 => 'RPL_WELCOME',           # RFC2812
@@ -452,6 +474,95 @@ sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
     return Bool::False;
 }
 
+# TODO This subroutine doesn't work quite right just yet so once it does,
+#      make sure to export it
+
+sub parse_mode_line(@args) {
+    my $chan_modes = [<beI k l imnpstaqr>];
+    my $stat_modes = 'ohv';
+    my %hash       = Nil;
+    my $count      = 0;
+
+    #for @args -> $arg
+    while my $arg = @args[$count] {
+        if $arg.WHAT.perl eq 'Array' {
+            $chan_modes = $arg;
+            next;
+        }
+        elsif $arg.WHAT.perl eq 'Hash' {
+            $stat_modes = join '', $arg.keys;
+            next;
+        }
+        elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
+            my $action = '+';
+
+            for $arg.split('') -> $c {
+                if $c eq '+' | '-' {
+                    $action = $c;
+                }
+                else {
+                    %hash<modes> = ();
+                    %hash<modes>.push($action ~ $c);
+                }
+
+                if $chan_modes[0].chars
+                    && $chan_modes[1].chars
+                    && $stat_modes.chars
+                    && $c ~~ /[{$stat_modes} | {$chan_modes[0]} | {$chan_modes[1]}]/ {
+                    #&& $c ~~ /<[{$stat_modes} {$chan_modes[0]} {$chan_modes[1]}]>/
+
+                    %hash<args> = ();
+                    %hash<args>.push(@args[$count]);
+                    #%hash<args>.push(@args.shift);
+                }
+
+                if $chan_modes[2].chars
+                    && $action eq '+' {
+                    #&& $c ~~ /<[{$chan_modes[2]}]>/
+
+                    %hash<args> = ();
+                    %hash<args>.push(@args.shift);
+                }
+            }
+        }
+        else {
+            %hash<args> = ();
+            %hash<args>.push($arg);
+        }
+
+        $count++;
+    }
+
+    return %hash;
+}
+
+sub normalize_mask(*@str is copy) is export {
+    my @mask;
+    my $remainder;
+
+    @str ~~ s:g/'*'**2..*/*/;
+
+    if @str !~~ /'!'/ and @str ~~ /'@'/ {
+        $remainder = @str;
+        @mask[0]   = '*';
+    }
+    else {
+        (@mask[0], $remainder) = @str.split('!', 2);
+    }
+
+    $remainder  ~~ s:g/'!'// if $remainder.defined;
+
+    @mask[1,2] = $remainder.split('@', 2) if $remainder.defined;
+    @mask[2]    ~~ s:g/'@'// if @mask[2].defined;
+
+    for 1..2 -> $i {
+        @mask[$i] = '*' if !@mask[$i].defined;
+        #@mask[$i] = '*' if !defined @mask[$i];
+    }
+
+    return @mask[0] ~ '!' ~ @mask[1] ~ '@' ~ @mask[2];
+}
+
 sub is_valid_nick_name(Str $nick) is export {
     #my regex complex {  _ \` \- \^ \| \\ \{\} \[\] };
     #my regex complex { '_' '`' '-' '|' '\\' '{' '}' '[' ']' };
@@ -493,6 +604,9 @@ sub has_color(Str $string) is export {
     return Bool::False;
 }
 
+# TODO Create rule/regex for matching format codes to reduce duplication
+#      in has_formatting() and strip_formatting()
+
 sub has_formatting(Str $string) is export {
     return Bool::True if $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/;
     return Bool::False;
@@ -508,8 +622,19 @@ sub strip_color(Str $string is copy) is export {
     # Strip ANSI escape codes
     $string ~~ s:g/\x1b \[ .*? <[\x00..\x1f \x40..\x7e]>//;
 
-    # Strip terminating \x0f but not for formatting codes
+    # Strip terminating \x0f only if there aren't any formatting codes
     $string ~~ s:g/\x0f// if !has_formatting($string);
+
+    return $string;
+}
+
+sub strip_formatting(Str $string is copy) is export {
+    $string ~~ s:g/<[\017 \02 \037 \026 \035 \021 \06]>//;
+    #$string ~~ s:g/<[\x0f \x02 \x1f \x16 \x1d \x11 \x06]>//;
+
+    # Strip terminating \x0f only if there aren't any color codes
+    $string ~~ s:g/<[\017]>// if !has_color($string);
+    #$string ~~ s:g/\x0f// if !has_color($string);
 
     return $string;
 }
