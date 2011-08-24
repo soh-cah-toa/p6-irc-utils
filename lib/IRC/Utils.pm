@@ -75,6 +75,22 @@ The C<$type> parameter is optional and represents the casemapping. It can be
 Returns C<Bool::True> if the nicknames are equivalent and C<Bool::False>
 otherwise.
 
+=head2 B<parse_mode_line(@mode)>
+
+Parses a list representing an IRC status mode line.
+
+The C<@mode> parameter is an array representing the status mode line to parse.
+You may also pass an array or hash to specify valid channel and status modes.
+If not given, the valid channel modes default to C<< <beI k l imnpstaqr> >> and
+the valid status modes default to C<< {o => '@', h => '%', v => '+'} >>.
+
+The hash returned has two keys: C<modes> and C<args>. The C<modes> key is an
+array of normalized modes. The C<args> keys is also an array that represents
+the relevant arguments to the modes in C<modes>.
+
+If for any reason the mode line in C<@mode> can not be parsed, a C<Nil> hash
+will be returned.
+
 =head2 B<normalize_mask(@str)>
 
 Fully qualifies or "normalizes" a host/server mask.
@@ -474,63 +490,68 @@ sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
     return Bool::False;
 }
 
-# TODO This subroutine doesn't work quite right just yet so once it does,
-#      make sure to export it
+# TODO @mode should be slurply but for some reason it doesn't work right
 
-sub parse_mode_line(@args) {
-    my $chan_modes = [<beI k l imnpstaqr>];
+sub parse_mode_line(@mode) is export {
+    my @chan_modes = <beI k l imnpstaqr>;
     my $stat_modes = 'ohv';
     my %hash       = Nil;
     my $count      = 0;
 
-    #for @args -> $arg
-    while my $arg = @args[$count] {
-        if $arg.WHAT.perl eq 'Array' {
-            $chan_modes = $arg;
-            next;
-        }
-        elsif $arg.WHAT.perl eq 'Hash' {
-            $stat_modes = join '', $arg.keys;
-            next;
-        }
-        elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
-            my $action = '+';
+    try {
+        while my $arg = @mode.shift {
+            if @mode.WHAT.perl eq 'Array' {
+                @chan_modes = $arg;
+                next;
+            }
+            elsif $arg.WHAT.perl eq 'Hash' {
+                $stat_modes = join '', $arg.keys;
+                next;
+            }
+            elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
+                my $action = '+';
 
-            for $arg.split('') -> $c {
-                if $c eq '+' | '-' {
-                    $action = $c;
-                }
-                else {
-                    %hash<modes> = ();
-                    %hash<modes>.push($action ~ $c);
-                }
+                for $arg.split('') -> $c {
+                    if $c eq '+' | '-' {
+                        $action = $c;
+                    }
+                    else {
+                        %hash.push('modes' => $action ~ $c);
+                    }
 
-                if $chan_modes[0].chars
-                    && $chan_modes[1].chars
-                    && $stat_modes.chars
-                    && $c ~~ /[{$stat_modes} | {$chan_modes[0]} | {$chan_modes[1]}]/ {
-                    #&& $c ~~ /<[{$stat_modes} {$chan_modes[0]} {$chan_modes[1]}]>/
+                    if @chan_modes[0].elems
+                        && @chan_modes[1].elems
+                        && $stat_modes.elems {
 
-                    %hash<args> = ();
-                    %hash<args>.push(@args[$count]);
-                    #%hash<args>.push(@args.shift);
-                }
+                        # This is a really ugly way of getting around the fact
+                        # that variable interpolation in character classes is
+                        # now illegal in Perl 6. Imagine this as if it were:
+                        #
+                        # $c ~~ /<[$stat_modes @chan_modes[0] @chan_modes[1]]>/
 
-                if $chan_modes[2].chars
-                    && $action eq '+' {
-                    #&& $c ~~ /<[{$chan_modes[2]}]>/
+                        my @a = @chan_modes[0..1].join('').comb;
 
-                    %hash<args> = ();
-                    %hash<args>.push(@args.shift);
+                        %hash.push('args' => @mode.shift)
+                            if $c ~~ ($stat_modes.comb | any(@a));
+                    }
+
+                    if @chan_modes[2].elems
+                        && $action eq '+'
+                        && $c ~~ (any(@chan_modes[2].join.comb)) {
+
+                        %hash.push('args' => @mode.shift)
+                    }
                 }
             }
-        }
-        else {
-            %hash<args> = ();
-            %hash<args>.push($arg);
-        }
+            else {
+                %hash.push('args' => $arg);
+            }
 
-        $count++;
+            $count++;
+        }
+    }
+    CATCH {
+        # Do nothing, just make sure things aren't borked by @mode.shift
     }
 
     return %hash;

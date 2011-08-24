@@ -171,7 +171,7 @@ plan *;
 
     todo 'The foreground test fails yet the strings are the same.';
 
-    #is $fg_strip, 'Look at the pretty foreground colors!',
+    is $fg_strip, 'Look at the pretty foreground colors!',
                   #'Check strip_color() with colored foreground';
 }
 
@@ -221,6 +221,32 @@ plan *;
     #is $strip, 'Just a normal plain message',
                #'Check strip_formatting() with unformatted text';
 #
+
+# Test parse_mode_line()
+{
+    my %hash = parse_mode_line(<mi foo bar>);
+
+    is %hash<modes>[0], '+m',  'Check parse_mode_line() with +m';
+    is %hash<modes>[1], '+i',  'Check parse_mode_line() with +i';
+
+    is %hash<args>[0],  'foo', "Check parse_mode_line() with 'foo' host";
+    is %hash<args>[1],  'bar', "Check parse_mode_line() with 'bar' server";
+}
+
+{
+    my %hash = parse_mode_line(qw/-b +b!*@*/);
+
+    is %hash<modes>[0], '-b',     'Check parse_mode_line() with -b';
+    is %hash<args>[0],  '+b!*@*', 'Check parse_mode_line() with +b!*@*';
+}
+
+{
+    my %hash = parse_mode_line(qw/+b -b!*@*/);
+
+    is %hash<modes>[0], '+b',     'Check parse_mode_line() with +b';
+    is %hash<args>[0],  '-b!*@*', 'Check parse_mode_line() with -b!*@*';
+}
+
 
 done;
 
