@@ -1,6 +1,8 @@
 # Copyright (C) 2011, Kevin Polulak <kpolulak@gmail.com>.
 
-=begin Pod
+module IRC::Utils:<soh_cah_toa 0.1.0>;
+
+=begin pod
 
 =head1 NAME
 
@@ -8,6 +10,9 @@ IRC::Utils - useful utilities for use in other IRC-related modules
 
 =head1 SYNOPSIS
 
+=begin code
+
+    use v6;
     use IRC::Utils;
 
     my Str $nick    = '[foo]^BAR^[baz]';
@@ -24,6 +29,8 @@ IRC::Utils - useful utilities for use in other IRC-related modules
         say "Nickname is valid!";
     }
 
+=end code
+
 =head1 DESCRIPTION
 
 The C<IRC::Utils> module provides a procedural interface for performing many
@@ -31,51 +38,62 @@ common IRC-related tasks such as comparing nicknames, changing user modes,
 normalizing ban masks, etc. It is meant to be used as a base module for
 creating other IRC-related modules.
 
+Internet Relay Chat (IRC) is a teleconferencing system used for real-time
+Internet chatting and conferencing. It is primarily used for group communication
+but also allows private one-to-one messages. The protocol is published in
+RFC 1459 <https://www.rfc-editor.org/rfc/rfc1459.txt>.
+
 =head1 SUBROUTINES
 
-=head2 B<uc_irc(Str $value, Str $type)>
+Unlike the C<IRC::Utils> module for Perl 5, you do not need to specify the
+C<:ALL> tag when importing the module. Therefore, the following subroutines
+are exported into the caller's namespace by default.
+
+=over 4
+
+=item B<uc_irc(Str $value, Str $type)>
 
 Converts a string to uppercase that conforms to the allowable characters as
 defined by RFC 1459.
 
-The C<$value> parameter is required and represents the string to convert to
-uppercase.
+The C<$value> parameter represents the string to convert to uppercase.
 
-The C<$type> parameter is optional and represents the casemapping. It can be
-'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+The C<$type> parameter is an optional string that represents C<$value>'s
+casemapping. It can be 'rfc1459', 'strict-rfc1459', or 'ascii'. If not given,
+it defaults to 'rfc1459'.
 
 Returns the value of C<$value> converted to uppercase according to C<$type>.
 
-=head2 B<lc_irc(Str $value, Str $type)>
+=item B<lc_irc(Str $value, Str $type)>
 
 Converts a string to lowercase that conforms to the allowable characters as
 defined by RFC 1459.
 
-The C<$value> parameter is required and represents the string to convert to
-lowercase.
+The C<$value> parameter represents the string to convert to lowercase.
 
-The C<$type> parameter is optional and represents the casemapping. It can be
-'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+The C<$type> parameter is an optional string that represents C<$value>'s
+casemapping. It can be 'rfc1459', 'strict-rfc1459', or 'ascii'. If not given,
+it defaults to 'rfc1459'.
 
 Returns the value of C<$value> converted to lowercase according to C<$type>.
 
-=head2 B<eq_irc(Str $first, Str $second, Str $type)>
+=item B<eq_irc(Str $first, Str $second, Str $type)>
 
-Checks the equivalence of two strings.
+Checks the equivalence of two strings that conform to the allowable characters
+as defined by RFC 1459.
 
-The C<$first> parameter is a string representing the first string to
-compare.
+The C<$first> parameter is the first string to compare.
 
-The C<$second> parameter is a string representing the second string to
-compare.
+The C<$second> parameter is the second string to compare.
 
-The C<$type> parameter is optional and represents the casemapping. It can be
-'rfc1459', 'strict-rfc1459', or 'ascii'. Defaults to 'rfc1459'.
+The C<$type> parameter is an optional string that represents the casemapping of
+C<$first> and C<$second>. It can be 'rfc1459', 'strict-rfc1459', or 'ascii'. If
+not given, it defaults to 'rfc1459'.
 
-Returns C<Bool::True> if the nicknames are equivalent and C<Bool::False>
+Returns C<Bool::True> if the two strings are equivalent and C<Bool::False>
 otherwise.
 
-=head2 B<parse_mode_line(@mode)>
+=item B<parse_mode_line(@mode)>
 
 Parses a list representing an IRC status mode line.
 
@@ -84,65 +102,67 @@ You may also pass an array or hash to specify valid channel and status modes.
 If not given, the valid channel modes default to C<< <beI k l imnpstaqr> >> and
 the valid status modes default to C<< {o => '@', h => '%', v => '+'} >>.
 
-The hash returned has two keys: C<modes> and C<args>. The C<modes> key is an
-array of normalized modes. The C<args> keys is also an array that represents
-the relevant arguments to the modes in C<modes>.
+Returns a hash containing two keys: C<modes> and C<args>. The C<modes> key is an
+array of normalized modes. The C<args> key is an array that represents the
+relevant arguments to the modes in C<modes>.
 
 If for any reason the mode line in C<@mode> can not be parsed, a C<Nil> hash
 will be returned.
 
-=head2 B<normalize_mask(@str)>
+=item B<normalize_mask(Str $mask)>
 
-Fully qualifies or "normalizes" a host/server mask.
+Fully qualifies or "normalizes" an IRC host/server mask.
 
-The C<@str> argument is a string representing a host/server mask.
+The C<$mask> argument is a string representing a host/server mask.
 
-Returns C<@str> as a fully qualified mask.
+Returns C<$mask> as a fully qualified mask.
 
-=head2 B<numeric_to_name(Int $code)>
+=item B<numeric_to_name(Int $code)>
 
-Converts a numeric code to its string representation. Includes all values
-defined by RFC1459 but also includes a few network-specific extensions.
+Converts an IRC reply or error code to its corresponding string representation.
+This includes all values defined by RFC 1459 and also a few network-specific
+extensions.
 
-The C<$code> parameter is an integer representing the numerical reply or
-error code. For instance, 461 which is C<ERR_NEEDMOREPARAMS>.
+The C<$code> parameter is an integer representing the numeric code to convert.
+For instance, 461 which is C<ERR_NEEDMOREPARAMS>.
 
 Returns the string representation of C<$code>.
 
-=head2 B<name_to_numeric(Str $name)>
+=item B<name_to_numeric(Str $name)>
 
-Converts a string to its numeric representation. Includes all values
-defined by RFC1459 but also includes a few network-specific extensions.
+Converts a string representation of an IRC reply or error code into its
+corresponding numeric code. This includes all values defined by RFC 1459 and
+also a few network-specific extensions.
 
 The C<$name> parameter is a string representing the reply or error code. For
 instance, C<ERR_NEEDMOREPARAMS> is 461.
 
 Returns the numerical representation of C<$name>.
 
-=head2 B<is_valid_nick_name(Str $nick)>
+=item B<is_valid_nick_name(Str $nick)>
 
-Checks if a nickname is valid. That is, it conforms to the allowable
+Checks if an IRC nickname is valid. That is, it conforms to the allowable
 characters defined in RFC 1459.
 
-The C<$nick> parameter is a string representing the nickname to check.
+The C<$nick> parameter is a string representing the nickname to validate.
 
-Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
+Returns C<Bool::True> if C<$nick> is a valid IRC nickname and C<Bool::False>
 otherwise.
 
-=head2 B<is_valid_chan_name(Str $chan, Str @types)>
+=item B<is_valid_chan_name(Str $chan, Str @types)>
 
-Checks if a channel name is valid. That is, it conforms to the allowable
+Checks if an IRC channel name is valid. That is, it conforms to the allowable
 characters defined in RFC 1459.
 
 The C<$chan> parameter is a string representing the channel name to check.
 
-The C<@types> parameter is optional and is an anonymous list of channel types.
-For instance, '#'. Defaults to C<['#', '&']>.
+The C<@types> parameter is an optional anonymous list of channel types. For
+instance, '#'. If not given, it defaults to C<['#', '&']>.
 
-Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
+Returns C<Bool::True> if C<$nick> is a valid IRC channel name and C<Bool::False>
 otherwise.
 
-=head2 B<unparse_mode_line(Str $line)>
+=item B<unparse_mode_line(Str $line)>
 
 Condenses or "unparses" an IRC mode line.
 
@@ -151,47 +171,38 @@ changes.
 
 Returns the condensed version of C<$line> as a string.
 
-=head2 C<gen_mode_change>
+=item B<parse_user(Str $user)>
 
-Takes two arguments, strings representing a set of IRC user modes before and
-after a change. Returns a string representing what changed.
+Parses a fully-qualified IRC username and splits it into the parts representing
+the nickname, username, and hostname.
 
-  my $mode_change = gen_mode_change('abcde', 'befmZ');
-  $mode_change is now '-acd+fmZ'
-
-
-=head2 B<parse_user(Str $user)>
-
-Parses a username and splits it into the parts representing the nickname,
-username, and hostname.
-
-The C<$user> parameter is a string representing the fully qualified username to
+The C<$user> parameter is a string representing the fully-qualified username to
 parse. It must be of the form C<nick!user@host>.
 
 Returns a list containing the nickname, username, and hostname parts of
 C<$user>.
 
-=head2 B<has_color(Str $string)>
+=item B<has_color(Str $string)>
 
-Checks if a string contains any color codes.
-
-The C<$string> parameter is the string to check.
-
-Returns C<Bool::True> if C<$string> contains any color codes and C<Bool::False>
-otherwise.
-
-=head2 B<has_formatting(Str $string)>
-
-Checks if a string contains any formatting codes.
+Checks if a string contains any embedded color codes.
 
 The C<$string> parameter is the string to check.
 
-Returns C<Bool::True> is C<$string> contains any formatting codes and
+Returns C<Bool::True> if C<$string> contains any embedded color codes and
 C<Bool::False> otherwise.
 
-=head2 B<strip_color(Str $string)>
+=item B<has_formatting(Str $string)>
 
-Strips a string of all embedded color codes.
+Checks if a string contains any embedded text formatting codes.
+
+The C<$string> parameter is the string to check.
+
+Returns C<Bool::True> if C<$string> contains any embedded formatting codes and
+C<Bool::False> otherwise.
+
+=item B<strip_color(Str $string)>
+
+Strips a string of all embedded color codes (if any).
 
 The C<$string> parameter is the string to strip.
 
@@ -199,21 +210,19 @@ Returns the string given in C<$string> with all embedded color codes removed.
 If the given string does not contain any color codes, the original string is
 returned as is.
 
-=head2 B<strip_formatting(Str $string)>
+=item B<strip_formatting(Str $string)>
 
-Strips a string of all embedded text format codes.
+Strips a string of all embedded text formatting codes (if any).
 
 The C<$string> parameter is the string to strip.
 
-Returns the string given in C<$string> with all embedded text format codes
+Returns the string given in C<$string> with all embedded text formatting codes
 removed. If the given string does not contain any text formatting codes, the
 original string is returned as is.
 
-=end Pod
+=back
 
-=cut
-
-module IRC::Utils;
+=end pod
 
 our $NORMAL      = "\x0f";
 
@@ -575,31 +584,30 @@ sub parse_mode_line(@mode) is export {
     return %hash;
 }
 
-sub normalize_mask(*@str is copy) is export {
-    my @mask;
+sub normalize_mask(Str $mask is copy) is export {
+    my @normalized;
     my $remainder;
 
-    @str ~~ s:g/'*'**2..*/*/;
+    $mask ~~ s:g/'*'**2..*/*/;
 
-    if @str !~~ /'!'/ and @str ~~ /'@'/ {
-        $remainder = @str;
-        @mask[0]   = '*';
+    if $mask !~~ /'!'/ and $mask ~~ /'@'/ {
+        $remainder     = $mask;
+        @normalized[0] = '*';
     }
     else {
-        (@mask[0], $remainder) = @str.split('!', 2);
+        (@normalized[0], $remainder) = $mask.split('!', 2);
     }
 
-    $remainder  ~~ s:g/'!'// if $remainder.defined;
+    $remainder ~~ s:g/'!'// if $remainder.defined;
 
-    @mask[1,2] = $remainder.split('@', 2) if $remainder.defined;
-    @mask[2]    ~~ s:g/'@'// if @mask[2].defined;
+    @normalized[1,2]  = $remainder.split('@', 2) if $remainder.defined;
+    @normalized[2]   ~~ s:g/'@'// if @normalized[2].defined;
 
     for 1..2 -> $i {
-        @mask[$i] = '*' if !@mask[$i].defined;
-        #@mask[$i] = '*' if !defined @mask[$i];
+        @normalized[$i] = '*' if !@normalized[$i].defined;
     }
 
-    return @mask[0] ~ '!' ~ @mask[1] ~ '@' ~ @mask[2];
+    return @normalized[0] ~ '!' ~ @normalized[1] ~ '@' ~ @normalized[2];
 }
 
 sub unparse_mode_line(Str $line) is export {
