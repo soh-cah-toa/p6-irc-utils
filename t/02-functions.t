@@ -3,6 +3,8 @@ use v6;
 use Test;
 use IRC::Utils;
 
+# TODO Organize tests so they're ordered the same way they are in source file
+
 plan *;
 
 # Test numeric_to_name()
@@ -247,6 +249,20 @@ plan *;
     is %hash<args>[0],  '-b!*@*', 'Check parse_mode_line() with -b!*@*';
 }
 
+# Test unparse_mode_line()
+{
+    my Str $mode     = '+m+m+m-i+i';
+    my Str $unparsed = unparse_mode_line($mode);
+    
+    is $unparsed, '+mmm-i+i', 'Check unparse_mode_line() with valid mode line';
+}
+
+{
+    my Str $mode     = '';
+    my Str $unparsed = unparse_mode_line($mode);
+    
+    is $unparsed, '', 'Check unparse_mode_line() with invalid mode line';
+}
 
 done;
 

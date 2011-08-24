@@ -142,6 +142,24 @@ For instance, '#'. Defaults to C<['#', '&']>.
 Returns C<Bool::True> if C<$nick> is a valid nickname and C<Bool::False>
 otherwise.
 
+=head2 B<unparse_mode_line(Str $line)>
+
+Condenses or "unparses" an IRC mode line.
+
+The C<$line> parameter is a string representing an arbitrary number of mode
+changes.
+
+Returns the condensed version of C<$line> as a string.
+
+=head2 C<gen_mode_change>
+
+Takes two arguments, strings representing a set of IRC user modes before and
+after a change. Returns a string representing what changed.
+
+  my $mode_change = gen_mode_change('abcde', 'befmZ');
+  $mode_change is now '-acd+fmZ'
+
+
 =head2 B<parse_user(Str $user)>
 
 Parses a username and splits it into the parts representing the nickname,
@@ -582,6 +600,29 @@ sub normalize_mask(*@str is copy) is export {
     }
 
     return @mask[0] ~ '!' ~ @mask[1] ~ '@' ~ @mask[2];
+}
+
+sub unparse_mode_line(Str $line) is export {
+    return '' if !$line.chars;
+
+    my $action;
+    my $return;
+
+    for $line.split('') -> $mode {
+        if $mode ~~ /^ [ '+' | '-' ] $/ && (!$action.defined || $mode ne $action) {
+            $return ~= $mode;
+            $action  = $mode;
+
+            next;
+        }
+
+        # TODO I should be able to write `if $mode ne all('+', '-')` but
+        #      for some reason I can't. Though it does work with any()
+
+        $return ~= $mode if $mode ne '+' and $mode ne '-';
+    }
+
+    return $return.subst(/<[+ \-]> $/, '');
 }
 
 sub is_valid_nick_name(Str $nick) is export {
