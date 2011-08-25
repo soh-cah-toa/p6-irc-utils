@@ -711,15 +711,15 @@ our %NAME2NUMERIC;
     %NAME2NUMERIC = @vals Z @keys;
 }
 
-sub numeric_to_name(Int $code) is export {
+sub numeric_to_name(Int $code) returns Str is export {
     return %NUMERIC2NAME{$code};
 }
 
-sub name_to_numeric(Str $name) is export {
+sub name_to_numeric(Str $name) returns Int is export {
     return %NAME2NUMERIC{$name}.Int;
 }
 
-sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
+sub uc_irc(Str $value is copy, Str $type = 'rfc1459') returns Str is export {
     my $t = $type.lc;
 
     if $t ~~ 'ascii' {
@@ -735,7 +735,7 @@ sub uc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
     return $value;
 }
 
-sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
+sub lc_irc(Str $value is copy, Str $type = 'rfc1459') returns Str is export {
     my $t = $type.lc;
 
     if $t ~~ 'ascii' {
@@ -751,7 +751,7 @@ sub lc_irc(Str $value is copy, Str $type = 'rfc1459') is export {
     return $value;
 }
 
-sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
+sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') returns Bool is export {
     return Bool::False if !$first.defined || !$second.defined;
 
     return Bool::True  if lc_irc($first, $type) eq lc_irc($second, $type);
@@ -760,7 +760,7 @@ sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') is export {
 
 # TODO @mode should be slurply but for some reason it doesn't work right
 
-sub parse_mode_line(@mode) is export {
+sub parse_mode_line(@mode) returns Hash is export {
     my @chan_modes = <beI k l imnpstaqr>;
     my $stat_modes = 'ohv';
     my %hash       = Nil;
@@ -825,7 +825,7 @@ sub parse_mode_line(@mode) is export {
     return %hash;
 }
 
-sub normalize_mask(Str $mask is copy) is export {
+sub normalize_mask(Str $mask is copy) returns Str is export {
     my @normalized;
     my $remainder;
 
@@ -851,7 +851,7 @@ sub normalize_mask(Str $mask is copy) is export {
     return [~] @normalized[0], '!', @normalized[1], '@', @normalized[2];
 }
 
-sub unparse_mode_line(Str $line) is export {
+sub unparse_mode_line(Str $line) returns Str is export {
     return '' if !$line.chars;
 
     my $action;
@@ -874,7 +874,7 @@ sub unparse_mode_line(Str $line) is export {
     return $return.subst(/<[+ \-]> $/, '');
 }
 
-sub is_valid_nick_name(Str $nick) is export {
+sub is_valid_nick_name(Str $nick) returns Bool is export {
     #my regex complex {  _ \` \- \^ \| \\ \{\} \[\] };
     #my regex complex { '_' '`' '-' '|' '\\' '{' '}' '[' ']' };
 
@@ -891,7 +891,7 @@ sub is_valid_nick_name(Str $nick) is export {
 # TODO Modify this to take just one arg and move #/& check into one regex b/c
 #      even though this is how the Perl 5 IRC::Utils works, I don't like it
 
-sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
+sub is_valid_chan_name(Str $chan, $types = ['#', '&']) returns Bool is export {
     return Bool::False if $types.chars == 0;
     return Bool::False if $chan.bytes  >  200;
     return Bool::False if $types ~~ /^ <-['#' '&']> $/;
@@ -906,11 +906,11 @@ sub is_valid_chan_name(Str $chan, $types = ['#', '&']) is export {
     return Bool::True;
 }
 
-sub parse_user(Str $user) is export {
+sub parse_user(Str $user) returns Array is export {
     return $user.split(/<[!@]>/);
 }
 
-sub has_color(Str $string) is export {
+sub has_color(Str $string) returns Bool is export {
     return Bool::True if $string ~~ /<[\x03 \x04 \x1b]>/;
     return Bool::False;
 }
@@ -918,12 +918,12 @@ sub has_color(Str $string) is export {
 # TODO Create rule/regex for matching format codes to reduce duplication
 #      in has_formatting() and strip_formatting()
 
-sub has_formatting(Str $string) is export {
+sub has_formatting(Str $string) returns Bool is export {
     return Bool::True if $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/;
     return Bool::False;
 }
 
-sub strip_color(Str $string is copy) is export {
+sub strip_color(Str $string is copy) returns Str is export {
     # Strip mIRC colors
     $string ~~ s:g/\x03 [\, \d**1..2 | \d**1..2 [\, \d**1..2]?]?//;
 
@@ -939,7 +939,7 @@ sub strip_color(Str $string is copy) is export {
     return $string;
 }
 
-sub strip_formatting(Str $string is copy) is export {
+sub strip_formatting(Str $string is copy) returns Str is export {
     $string ~~ s:g/<[\017 \02 \037 \026 \035 \021 \06]>//;
     #$string ~~ s:g/<[\x0f \x02 \x1f \x16 \x1d \x11 \x06]>//;
 
