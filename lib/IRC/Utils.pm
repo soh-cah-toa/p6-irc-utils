@@ -462,6 +462,8 @@ Example:
 
 =end pod
 
+# TODO Add declaractor blocks when Rakudo supports them
+
 our $NORMAL      = "\x0f";
 
 # Text formats

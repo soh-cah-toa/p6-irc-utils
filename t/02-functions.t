@@ -4,6 +4,7 @@ use Test;
 use IRC::Utils;
 
 # TODO Organize tests so they're ordered the same way they are in source file
+# TODO Add tests for color and formatting constants
 
 plan *;
 
