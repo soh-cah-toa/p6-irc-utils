@@ -403,6 +403,63 @@ Example:
 
 =back
 
+=head1 CONSTANTS
+
+The following constants are provided to embed color and formatting codes in IRC
+messages.
+
+=over 4
+
+=item Normal text:
+
+    NORMAL
+
+=item Formatting:
+
+    BOLD
+    UNDERLINE
+    REVERSE
+    ITALIC
+    FIXED
+
+=item Colors:
+
+    WHITE
+    BLACK
+    BLUE
+    GREEN
+    RED
+    BROWN
+    PURPLE
+    ORANGE
+    YELLOW
+    LIGHT_GREEN
+    TEAL
+    LIGHT_CYAN
+    LIGHT_BLUE
+    PINK
+    GREY
+    LIGHT_GREY
+
+=back
+
+To terminate a single formatting code, you must use its respective constant.
+Additionally, you may use the C<NORMAL> constant to terminate I<all> formatting
+codes (including colors).
+
+Conversely, a single color code must be terminated with the C<NORMAL> constant.
+However, this has the side effect of also terminating any other formatting
+codes.
+
+Example:
+
+=begin code
+
+    my Str $foo = 'Oh hai! I haz ' ~ GREEN ~ 'green ' ~ NORMAL ~ 'text!';
+    my Str $bar = BOLD ~ UNDERLINE ~ 'K thx bye!' ~ NORMAL;
+
+=end code
+
 =end pod
 
 our $NORMAL      = "\x0f";
