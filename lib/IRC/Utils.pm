@@ -463,6 +463,7 @@ Example:
 =end pod
 
 # TODO Add declaractor blocks when Rakudo supports them
+# TODO Use comb/join hack to get around unsupported escapes in character classes
 
 our $NORMAL      = "\x0f";
 
@@ -828,7 +829,7 @@ sub normalize_mask(Str $mask is copy) is export {
     my @normalized;
     my $remainder;
 
-    $mask ~~ s:g/'*'**2..*/*/;
+    $mask.subst(/'*'**2..*/, '*', :g);
 
     if $mask !~~ /'!'/ and $mask ~~ /'@'/ {
         $remainder     = $mask;
@@ -838,16 +839,16 @@ sub normalize_mask(Str $mask is copy) is export {
         (@normalized[0], $remainder) = $mask.split('!', 2);
     }
 
-    $remainder ~~ s:g/'!'// if $remainder.defined;
+    $remainder.subst('!', '', :g) if $remainder.defined;
 
-    @normalized[1,2]  = $remainder.split('@', 2) if $remainder.defined;
-    @normalized[2]   ~~ s:g/'@'// if @normalized[2].defined;
+    @normalized[1..2] = $remainder.split('@', 2) if $remainder.defined;
+    @normalized[2].subst('@', '', :g)            if @normalized[2].defined;
 
     for 1..2 -> $i {
         @normalized[$i] = '*' if !@normalized[$i].defined;
     }
 
-    return @normalized[0] ~ '!' ~ @normalized[1] ~ '@' ~ @normalized[2];
+    return [~] @normalized[0], '!', @normalized[1], '@', @normalized[2];
 }
 
 sub unparse_mode_line(Str $line) is export {
