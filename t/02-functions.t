@@ -147,15 +147,15 @@ plan *;
 
 # Test has_formatting()
 {
-    my $fmt_msg = "This message has \x1funderlined\x0f text";
-    my $has_fmt = has_formatting($fmt_msg);
+    my Str $fmt_msg = "This message has \x1funderlined\x0f text";
+    my Str $has_fmt = has_formatting($fmt_msg);
 
     ok $has_fmt, 'Check has_formatting() with formatted text';
 }
 
 {
-    my $normal_msg = 'This message has no formatted text';
-    my $has_fmt    = has_formatting($normal_msg);
+    my Str $normal_msg = 'This message has no formatted text';
+    my Str $has_fmt    = has_formatting($normal_msg);
 
     ok $has_fmt, 'Check has_formatting() with normal text';
 }
