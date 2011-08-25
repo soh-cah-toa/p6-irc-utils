@@ -6,7 +6,7 @@ module IRC::Utils:<soh_cah_toa 0.1.0>;
 
 =head1 NAME
 
-IRC::Utils - useful utilities for use in other IRC-related modules
+IRC::Utils - handy IRC utilities for use in other IRC-related modules
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,17 @@ it defaults to 'rfc1459'.
 
 Returns the value of C<$value> converted to uppercase according to C<$type>.
 
+Example:
+
+=begin code
+
+    my Str $uc_hello = uc_irc('Hello world!');
+
+    say $hello;
+    # Output: HELLO WORLD!
+
+=end code
+
 =item B<lc_irc(Str $value, Str $type)>
 
 Converts a string to lowercase that conforms to the allowable characters as
@@ -76,6 +87,17 @@ casemapping. It can be 'rfc1459', 'strict-rfc1459', or 'ascii'. If not given,
 it defaults to 'rfc1459'.
 
 Returns the value of C<$value> converted to lowercase according to C<$type>.
+
+Example:
+
+=begin code
+
+    my Str $lc_hello = lc_irc('HELLO WORLD!');
+
+    say $lc_irc;
+    # Output: hello world!
+
+=end code
 
 =item B<eq_irc(Str $first, Str $second, Str $type)>
 
@@ -93,6 +115,19 @@ not given, it defaults to 'rfc1459'.
 Returns C<Bool::True> if the two strings are equivalent and C<Bool::False>
 otherwise.
 
+Example:
+
+=begin code
+
+    my Str  $upper = '[F00~B4R~B4Z]';
+    my Str  $lower = '{f00~b4r~b4z}';
+    my Bool $equal =  eq_irc();
+
+    say 'They're equal!' if $equal;
+    # Output: They're equal!
+
+=end code
+
 =item B<parse_mode_line(@mode)>
 
 Parses a list representing an IRC status mode line.
@@ -109,6 +144,25 @@ relevant arguments to the modes in C<modes>.
 If for any reason the mode line in C<@mode> can not be parsed, a C<Nil> hash
 will be returned.
 
+Example:
+
+=begin code
+
+    my %hash = parse_mode_line(<ov foo bar>);    
+
+    say %hash<modes>[0];
+    # Output: +o
+
+    say %hash<modes>[1];
+    # Output: +v
+
+    say %hash<args>[0];
+    # Output: foo
+
+    say %hash<args>[1];
+    # Output: bar
+=end code
+
 =item B<normalize_mask(Str $mask)>
 
 Fully qualifies or "normalizes" an IRC host/server mask.
@@ -116,6 +170,17 @@ Fully qualifies or "normalizes" an IRC host/server mask.
 The C<$mask> argument is a string representing a host/server mask.
 
 Returns C<$mask> as a fully qualified mask.
+
+Example:
+
+=begin code
+
+    my Str $mask = normalize_mask('*@*');
+
+    say $mask;
+    # Output: *!*@*
+
+=end code
 
 =item B<numeric_to_name(Int $code)>
 
@@ -128,6 +193,17 @@ For instance, 461 which is C<ERR_NEEDMOREPARAMS>.
 
 Returns the string representation of C<$code>.
 
+Example:
+
+=begin code
+
+    my Str $topic = numeric_to_name(332);
+
+    say $topic;
+    # Output: RPL_TOPIC
+
+=end code
+
 =item B<name_to_numeric(Str $name)>
 
 Converts a string representation of an IRC reply or error code into its
@@ -139,6 +215,17 @@ instance, C<ERR_NEEDMOREPARAMS> is 461.
 
 Returns the numerical representation of C<$name>.
 
+Example:
+
+=begin code
+
+    my Int $topic name_to_numeric('RPL_TOPIC');
+
+    say $topic;
+    # Output: 332
+
+=end code
+
 =item B<is_valid_nick_name(Str $nick)>
 
 Checks if an IRC nickname is valid. That is, it conforms to the allowable
@@ -148,6 +235,17 @@ The C<$nick> parameter is a string representing the nickname to validate.
 
 Returns C<Bool::True> if C<$nick> is a valid IRC nickname and C<Bool::False>
 otherwise.
+
+Example:
+
+=begin code
+
+    my Bool $valid_nick = is_valid_nick_name('{foo_bar_baz}');
+
+    say 'Nickname is valid!' if $valid_nick;
+    # Output: Nickname is valid!
+
+=end code
 
 =item B<is_valid_chan_name(Str $chan, Str @types)>
 
@@ -162,6 +260,17 @@ instance, '#'. If not given, it defaults to C<['#', '&']>.
 Returns C<Bool::True> if C<$nick> is a valid IRC channel name and C<Bool::False>
 otherwise.
 
+Example:
+
+=begin code
+
+    my Bool $valid_chan = is_valid_chan_name('#foobar');
+
+    say 'Channel name is valid!' if $valid_chan;    
+    # Output: Channel name is valid!
+
+=end code
+
 =item B<unparse_mode_line(Str $line)>
 
 Condenses or "unparses" an IRC mode line.
@@ -170,6 +279,17 @@ The C<$line> parameter is a string representing an arbitrary number of mode
 changes.
 
 Returns the condensed version of C<$line> as a string.
+
+Example:
+
+=begin code
+
+    my Str $mode = unparse_mode_line('+m+m+m-i+i');
+
+    say $mode;
+    # Output: +mmm-i+i
+
+=end code
 
 =item B<parse_user(Str $user)>
 
@@ -182,6 +302,23 @@ parse. It must be of the form C<nick!user@host>.
 Returns a list containing the nickname, username, and hostname parts of
 C<$user>.
 
+Example:
+
+=begin code
+
+    my Str ($nick, $user, $host) = parse_user('foo!bar@baz.net');
+
+    say $nick
+    # Output: foo
+
+    say $user
+    # Output: bar
+
+    say $host
+    # Output: baz.net
+
+=end code
+
 =item B<has_color(Str $string)>
 
 Checks if a string contains any embedded color codes.
@@ -191,6 +328,17 @@ The C<$string> parameter is the string to check.
 Returns C<Bool::True> if C<$string> contains any embedded color codes and
 C<Bool::False> otherwise.
 
+Example:
+
+=begin code
+
+    my Bool $color = has_color("\x0304,05This is a colored message\x03");
+
+    say 'Oh, pretty colors!' if $color;
+    # Output: Oh, pretty colors!
+
+=end code
+
 =item B<has_formatting(Str $string)>
 
 Checks if a string contains any embedded text formatting codes.
@@ -199,6 +347,17 @@ The C<$string> parameter is the string to check.
 
 Returns C<Bool::True> if C<$string> contains any embedded formatting codes and
 C<Bool::False> otherwise.
+
+Example:
+
+=begin code
+
+    my Bool $fmt_text = has_formatting("This message has \x1funderlined\x0f text");
+
+    say 'I got some formatted text!' if $fmt_text;
+    # Output: I got some formatted text!
+
+=end code
 
 =item B<strip_color(Str $string)>
 
@@ -210,6 +369,17 @@ Returns the string given in C<$string> with all embedded color codes removed.
 If the given string does not contain any color codes, the original string is
 returned as is.
 
+Example:
+
+=begin code
+
+    my Str $stripped = strip_color("\x03,05Look at the pretty colors!\x03");
+
+    say $stripped;
+    # Output: Look at the pretty colors!
+
+=end code
+
 =item B<strip_formatting(Str $string)>
 
 Strips a string of all embedded text formatting codes (if any).
@@ -219,6 +389,17 @@ The C<$string> parameter is the string to strip.
 Returns the string given in C<$string> with all embedded text formatting codes
 removed. If the given string does not contain any text formatting codes, the
 original string is returned as is.
+
+Example:
+
+=begin code
+
+    my Str $stripped = strip_formatting('This is \x02strong\x0f!");
+
+    say $stripped;
+    # Output: This is strong!
+
+=end code
 
 =back
 
