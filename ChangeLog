@@ -1,3 +1,13 @@
+2011-08-25  Kevin Polulak  <kpolulak@gmail.com>
+	* Released 0.1.0
+	First beta release
+	New subroutines
+		- parse_mode_line()
+		- unparse_mode_line()
+	Improved documentation with examples
+	Better test coverage
+	All tests pass with 1 todo
+
 2011-08-18  Kevin Polulak  <kpolulak@gmail.com>
 	* Released 0.0.3
 	New subroutines
