@@ -265,6 +265,25 @@ plan *;
     is $unparsed, '', 'Check unparse_mode_line() with invalid mode line';
 }
 
+# Test gen_mode_change()
+{
+    my Str $mode = gen_mode_change('i', 'ailowz');
+
+    is $mode, '+alowz', 'Check gen_mode_change() to add modes';
+}
+
+{
+    my Str $mode = gen_mode_change('ailowz', 'i');
+
+    is $mode, '-alowz', 'Check gen_mode_change() to remove modes';
+}
+
+{
+    my Str $mode = gen_mode_change('i', 'alowz');
+
+    is $mode, '-i+alowz', 'Check gen_mode_change() to remove and add modes';
+}
+
 done;
 
 # vim: ft=perl6

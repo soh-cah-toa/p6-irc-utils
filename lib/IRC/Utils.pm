@@ -291,6 +291,31 @@ Example:
 
 =end code
 
+=head2 C<gen_mode_change(Str $before, Str $after)>
+
+Determines the changes made between two IRC user modes.
+
+The C<$before> parameter is a string representing the user mode before the
+change.
+
+The C<$after> parameter is a string representing the user mode after the
+change.
+
+Returns a string representing the modes that changed between C<$before> and
+C<$after>. That is, any modes that were added or removed from C<$before> to
+create C<$after>.
+
+Example:
+
+=begin code
+
+    my Str $mode_change = gen_mode_change('abcde', 'befmZ');
+
+    say $mode_change;
+    # Output: -acd+fmZ
+
+=end code
+
 =item B<parse_user(Str $user)>
 
 Parses a fully-qualified IRC username and splits it into the parts representing
@@ -720,32 +745,36 @@ sub name_to_numeric(Str $name) returns Int is export {
 }
 
 sub uc_irc(Str $value is copy, Str $type = 'rfc1459') returns Str is export {
-    my $t = $type.lc;
+    given $type.lc {
+        when 'ascii' {
+            $value.=trans('a..z' => 'A..Z');
+        }
 
-    if $t ~~ 'ascii' {
-        $value.=trans('a..z' => 'A..Z');
-    }
-    elsif $t ~~ 'strict-rfc1459' {
-        $value.=trans('a..z{}|' => 'A..Z[]\\');
-    }
-    else {
-        $value.=trans('a..z{}|^' => 'A..Z[]\\~');
+        when 'strict-rfc1459' {
+            $value.=trans('a..z{}|' => 'A..Z[]\\');
+        }
+
+        default {
+            $value.=trans('a..z{}|^' => 'A..Z[]\\~');
+        }
     }
 
     return $value;
 }
 
 sub lc_irc(Str $value is copy, Str $type = 'rfc1459') returns Str is export {
-    my $t = $type.lc;
+    given $type.lc {
+        when 'ascii' {
+            $value.=trans('A..Z' => 'a..z');
+        }
 
-    if $t ~~ 'ascii' {
-        $value.=trans('A..Z' => 'a..z');
-    }
-    elsif $t ~~ 'strict-rfc1459' {
-        $value.=trans('A..Z[]\\' => 'a..z{}|');
-    }
-    else {
-        $value.=trans('A..Z[]\\~' => 'a..z{}|^');
+        when 'strict-rfc1459' {
+            $value.=trans('A..Z[]\\' => 'a..z{}|');
+        }
+
+        default {
+            $value.=trans('A..Z[]\\~' => 'a..z{}|^');
+        }
     }
 
     return $value;
@@ -871,7 +900,17 @@ sub unparse_mode_line(Str $line) returns Str is export {
         $return ~= $mode if $mode ne '+' and $mode ne '-';
     }
 
-    return $return.subst(/<[+ \-]> $/, '');
+    return $return.subst(/<[+ \-]> $/, /<?>/);
+}
+
+sub gen_mode_change(Str $before is copy, Str $after is copy) returns Str is export {
+    $before = '' if !$before.defined;
+    $after  = '' if !$after.defined;
+
+    my $string = '';
+    $string   ~= [~] _diff($before.split(''), $after.split(''));
+
+    return unparse_mode_line($string);
 }
 
 sub is_valid_nick_name(Str $nick) returns Bool is export {
@@ -948,6 +987,37 @@ sub strip_formatting(Str $string is copy) returns Str is export {
     #$string ~~ s:g/\x0f// if !has_color($string);
 
     return $string;
+}
+
+sub _diff(@before, @after) returns Array {
+    my %in_before;
+    my %in_after;
+
+    my @diff;
+    my %seen;
+
+    %in_before{"$_"} = () for @before;
+    %in_after{"$_"}  = () for @after;
+
+    for @before -> $b {
+        next if %seen.exists($b) || %in_after.exists($b);
+
+        %seen<$b> = 1;
+
+        @diff.push('-', $b);
+    }
+
+    #%seen = ();
+
+    for @after -> $a {
+        next if %seen.exists($a) || %in_before.exists($a);
+
+        %seen<$a> = 1;
+
+        @diff.push('+', $a);
+    }
+
+    return @diff;
 }
 
 # vim: ft=perl6
