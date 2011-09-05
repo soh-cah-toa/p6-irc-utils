@@ -5,6 +5,7 @@ use IRC::Utils;
 
 # TODO Organize tests so they're ordered the same way they are in source file
 # TODO Add tests for color and formatting constants
+# TODO Add test with casemapping for matches_mask()
 
 plan *;
 
@@ -282,6 +283,23 @@ plan *;
     my Str $mode = gen_mode_change('i', 'alowz');
 
     is $mode, '-i+alowz', 'Check gen_mode_change() to remove and add modes';
+}
+
+# Test matches_mask()
+{
+    my Str  $mask  = 'foobar*!*@*';
+    my Str  $user  = 'foobar!baz@qux.net';
+    my Bool $match = matches_mask($mask, $user);
+
+    ok $match, 'Check matches_mask() with matching name, no mapping';
+}
+
+{
+    my Str  $mask  = 'foobar*!*@*';
+    my Str  $user  = 'blah!blah@blah.net';
+    my Bool $match = matches_mask($mask, $user);
+
+    nok $match, 'Check matches_mask() with non-matching name, no mapping';
 }
 
 done;

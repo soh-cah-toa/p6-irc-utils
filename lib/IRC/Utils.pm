@@ -316,6 +316,31 @@ Example:
 
 =end code
 
+=item B<matches_mask(Str $mask, Str $match, Str $mapping?)>
+
+Determines whether a particular user/server matches an IRC mask.
+
+The C<$mask> parameter is a string representing the IRC mask to match against.
+
+The C<$match> parameter is a string representing the user/server to check.
+
+The C<$mapping> parameter is an optional string that specifies which
+casemapping to use for C<$mask> and C<$match>. It can be 'rfc1459',
+'strict-rfc1459', or 'ascii'. If not given, it defaults to 'rfc1459'.
+
+Example:
+
+=begin code
+
+    my Str  $banmask = 'foobar*!*@*';
+    my Str  $user    = 'foobar!baz@qux.net';
+    my Bool $matches = matches_mask($banmask, $user);
+
+    say "The user $user is banned" if $matches;
+    # Output: The user foobar!baz@qux.net is banned
+
+=end code
+
 =item B<parse_user(Str $user)>
 
 Parses a fully-qualified IRC username and splits it into the parts representing
@@ -943,6 +968,24 @@ sub is_valid_chan_name(Str $chan, $types = ['#', '&']) returns Bool is export {
     }
 
     return Bool::True;
+}
+
+sub matches_mask(Str $mask is copy, Str $match is copy, Str $mapping? is copy) is export {
+    my $umask = uc_irc($mask, $mapping);
+
+    # TODO Use better regex since <print> includes forbidden characters
+    $umask.=subst('*', '<print>**0..*', :g);
+    $umask.=subst('?', '<print>**1..1', :g);
+
+    # Escape metacharacters
+    $umask.=subst('!', '\!', :g);
+    $match.=subst('!', '\!', :g);
+    $umask.=subst('@', '\@', :g);
+    $match.=subst('@', '\@', :g);
+
+    $match = uc_irc($match, $mapping);
+
+    return $match ~~ /^ <$umask> $/ ?? Bool::True !! Bool::False;
 }
 
 sub parse_user(Str $user) returns Array is export {
