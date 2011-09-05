@@ -51,7 +51,7 @@ are exported into the caller's namespace by default.
 
 =over 4
 
-=item B<uc_irc(Str $value, Str $type)>
+=item B<uc_irc(Str $value, Str $type?)>
 
 Converts a string to uppercase that conforms to the allowable characters as
 defined by RFC 1459.
@@ -75,7 +75,7 @@ Example:
 
 =end code
 
-=item B<lc_irc(Str $value, Str $type)>
+=item B<lc_irc(Str $value, Str $type?)>
 
 Converts a string to lowercase that conforms to the allowable characters as
 defined by RFC 1459.
@@ -99,7 +99,7 @@ Example:
 
 =end code
 
-=item B<eq_irc(Str $first, Str $second, Str $type)>
+=item B<eq_irc(Str $first, Str $second, Str $type?)>
 
 Checks the equivalence of two strings that conform to the allowable characters
 as defined by RFC 1459.
@@ -247,7 +247,7 @@ Example:
 
 =end code
 
-=item B<is_valid_chan_name(Str $chan, Str @types)>
+=item B<is_valid_chan_name(Str $chan, Str @types?)>
 
 Checks if an IRC channel name is valid. That is, it conforms to the allowable
 characters defined in RFC 1459.
