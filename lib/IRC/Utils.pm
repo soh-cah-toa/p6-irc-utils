@@ -808,11 +808,10 @@ sub lc_irc(Str $value is copy, Str $type = 'rfc1459') returns Str is export {
 sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') returns Bool is export {
     return Bool::False if !$first.defined || !$second.defined;
 
-    return Bool::True  if lc_irc($first, $type) eq lc_irc($second, $type);
-    return Bool::False;
+    return lc_irc($first, $type) eq lc_irc($second, $type) ?? Bool::True !! Bool::False;
 }
 
-# TODO @mode should be slurply but for some reason it doesn't work right
+# TODO @mode should be slurpy but for some reason it doesn't work right
 
 sub parse_mode_line(@mode) returns Hash is export {
     my @chan_modes = <beI k l imnpstaqr>;
@@ -945,11 +944,9 @@ sub is_valid_nick_name(Str $nick) returns Bool is export {
     # TODO Get 'complex' regex to interpolate properly to reduce duplication
     # TODO Add backslash to regex
 
-    return Bool::True if $nick
-        ~~ /^ <[A..Z a..z      _ \- ` ^ | \{\} \[\]]>
-              <[A..Z a..z 0..9 _ \- ` ^ | \{\} \[\]]>* $/;
-
-    return Bool::False;
+    return $nick ~~ /^ <[A..Z a..z      _ \- ` ^ | \{\} \[\]]>
+                       <[A..Z a..z 0..9 _ \- ` ^ | \{\} \[\]]>* $/
+        ?? Bool::True !! Bool::False;
 }
 
 # TODO Modify this to take just one arg and move #/& check into one regex b/c
@@ -993,16 +990,16 @@ sub parse_user(Str $user) returns Array is export {
 }
 
 sub has_color(Str $string) returns Bool is export {
-    return Bool::True if $string ~~ /<[\x03 \x04 \x1b]>/;
-    return Bool::False;
+    return $string ~~ /<[\x03 \x04 \x1b]>/ ?? Bool::True !! Bool::False;
 }
 
 # TODO Create rule/regex for matching format codes to reduce duplication
 #      in has_formatting() and strip_formatting()
 
 sub has_formatting(Str $string) returns Bool is export {
-    return Bool::True if $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/;
-    return Bool::False;
+    return $string ~~ /<[\x02 \x1f \x16 \x1d \x11 \x06]>/
+        ?? Bool::True
+        !! Bool::False;
 }
 
 sub strip_color(Str $string is copy) returns Str is export {
