@@ -545,20 +545,20 @@ our $LIGHT_GREY  = "\x0315";
 
 # Associates numeric codes with their string representation
 our %NUMERIC2NAME =
-   001 => 'RPL_WELCOME',           # RFC2812
-   002 => 'RPL_YOURHOST',          # RFC2812
-   003 => 'RPL_CREATED',           # RFC2812
-   004 => 'RPL_MYINFO',            # RFC2812
-   005 => 'RPL_ISUPPORT',          # draft-brocklesby-irc-isupport-03
-   008 => 'RPL_SNOMASK',           # Undernet
-   009 => 'RPL_STATMEMTOT',        # Undernet
-   010 => 'RPL_STATMEM',           # Undernet
-   020 => 'RPL_CONNECTING',        # IRCnet
-   014 => 'RPL_YOURCOOKIE',        # IRCnet
-   042 => 'RPL_YOURID',            # IRCnet
-   043 => 'RPL_SAVENICK',          # IRCnet
-   050 => 'RPL_ATTEMPTINGJUNC',    # aircd
-   051 => 'RPL_ATTEMPTINGREROUTE', # aircd
+   1 => 'RPL_WELCOME',           # RFC2812
+   2 => 'RPL_YOURHOST',          # RFC2812
+   3 => 'RPL_CREATED',           # RFC2812
+   4 => 'RPL_MYINFO',            # RFC2812
+   5 => 'RPL_ISUPPORT',          # draft-brocklesby-irc-isupport-03
+   8 => 'RPL_SNOMASK',           # Undernet
+   9 => 'RPL_STATMEMTOT',        # Undernet
+   10 => 'RPL_STATMEM',           # Undernet
+   20 => 'RPL_CONNECTING',        # IRCnet
+   14 => 'RPL_YOURCOOKIE',        # IRCnet
+   42 => 'RPL_YOURID',            # IRCnet
+   43 => 'RPL_SAVENICK',          # IRCnet
+   50 => 'RPL_ATTEMPTINGJUNC',    # aircd
+   51 => 'RPL_ATTEMPTINGREROUTE', # aircd
    200 => 'RPL_TRACELINK',         # RFC1459
    201 => 'RPL_TRACECONNECTING',   # RFC1459
    202 => 'RPL_TRACEHANDSHAKE',    # RFC1459
@@ -755,7 +755,7 @@ our %NUMERIC2NAME =
 our %NAME2NUMERIC;
 
 {
-    my Int @keys  = %NUMERIC2NAME.keys;
+    my Int @keys  = map { +$_ }, %NUMERIC2NAME.keys;
     my Str @vals  = %NUMERIC2NAME.values;
 
     %NAME2NUMERIC = @vals Z @keys;
@@ -820,7 +820,7 @@ sub parse_mode_line(@mode) returns Hash is export {
     my $count      = 0;
 
     try {
-        while my $arg = @mode.shift {
+        for @mode -> $arg {
             if @mode.WHAT.perl eq 'Array' {
                 @chan_modes = $arg;
                 next;
@@ -832,7 +832,7 @@ sub parse_mode_line(@mode) returns Hash is export {
             elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
                 my $action = '+';
 
-                for $arg.split('') -> $c {
+                for $arg.comb -> $c {
                     if $c eq '+' | '-' {
                         $action = $c;
                     }
@@ -954,7 +954,7 @@ sub is_valid_nick_name(Str $nick) returns Bool is export {
 
 sub is_valid_chan_name(Str $chan, $types = ['#', '&']) returns Bool is export {
     return Bool::False if $types.chars == 0;
-    return Bool::False if $chan.bytes  >  200;
+    return Bool::False if $chan.chars  >  200;
     return Bool::False if $types ~~ /^ <-['#' '&']> $/;
 
     for $types -> $t {
@@ -971,21 +971,21 @@ sub matches_mask(Str $mask is copy, Str $match is copy, Str $mapping? is copy) i
     my $umask = uc_irc($mask, $mapping);
 
     # TODO Use better regex since <print> includes forbidden characters
-    $umask.=subst('*', '<print>**0..*', :g);
-    $umask.=subst('?', '<print>**1..1', :g);
+    $umask.=subst('*', '.*', :g);
+    $umask.=subst('?', '.', :g);
 
     # Escape metacharacters
     $umask.=subst('!', '\!', :g);
-    $match.=subst('!', '\!', :g);
+    #$match.=subst('!', '\!', :g);
     $umask.=subst('@', '\@', :g);
-    $match.=subst('@', '\@', :g);
+    #$match.=subst('@', '\@', :g);
 
     $match = uc_irc($match, $mapping);
 
     return $match ~~ /^ <$umask> $/ ?? Bool::True !! Bool::False;
 }
 
-sub parse_user(Str $user) returns Array is export {
+sub parse_user(Str $user) returns List is export {
     return $user.split(/<[!@]>/);
 }
 
@@ -1040,7 +1040,7 @@ sub _diff(@before, @after) returns Array {
     %in_after{"$_"}  = () for @after;
 
     for @before -> $b {
-        next if %seen.exists($b) || %in_after.exists($b);
+        next if (%seen{$b} :exists) || (%in_after{$b} :exists);
 
         %seen<$b> = 1;
 
@@ -1050,7 +1050,7 @@ sub _diff(@before, @after) returns Array {
     #%seen = ();
 
     for @after -> $a {
-        next if %seen.exists($a) || %in_before.exists($a);
+        next if (%seen{$a} :exists) || (%in_before{$a} :exists);
 
         %seen<$a> = 1;
 
