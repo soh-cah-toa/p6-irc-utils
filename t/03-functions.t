@@ -159,13 +159,13 @@ plan *;
     my Str  $normal_msg = 'This message has no formatted text';
     my Bool $has_fmt    = has_formatting($normal_msg);
 
-    ok $has_fmt, 'Check has_formatting() with normal text';
+    nok $has_fmt, 'Check has_formatting() with normal text';
 }
 
 # Test strip_color()
 {
     my Str $bg_color = "\x03,05Look at the pretty background colors!\x03";
-    my Str $fg_color = "\x0305Look at the pretty foreground colors!\x03";
+    my Str $fg_color = "\x[03]05Look at the pretty foreground colors!\x03";
 
     my Str $bg_strip = strip_color($bg_color);
     my Str $fg_strip = strip_color($fg_color);
@@ -173,10 +173,8 @@ plan *;
     is $bg_strip, 'Look at the pretty background colors!',
                   'Check strip_color() with colored background';
 
-    todo 'The foreground test fails yet the strings are the same.';
-
     is $fg_strip, 'Look at the pretty foreground colors!',
-                  #'Check strip_color() with colored foreground';
+                  'Check strip_color() with colored foreground';
 }
 
 {
