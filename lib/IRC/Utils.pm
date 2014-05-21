@@ -813,66 +813,62 @@ sub eq_irc(Str $first, Str $second, Str $type = 'rfc1459') returns Bool is expor
 
 # TODO @mode should be slurpy but for some reason it doesn't work right
 
-sub parse_mode_line(@mode) returns Hash is export {
+sub parse_mode_line(@mode is copy) returns Hash is export {
+    @mode = @mode.list;
     my @chan_modes = <beI k l imnpstaqr>;
     my $stat_modes = 'ohv';
     my %hash       = Nil;
     my $count      = 0;
 
-    try {
-        for @mode -> $arg {
-            if @mode.WHAT.perl eq 'Array' {
-                @chan_modes = $arg;
-                next;
-            }
-            elsif $arg.WHAT.perl eq 'Hash' {
-                $stat_modes = join '', $arg.keys;
-                next;
-            }
-            elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
-                my $action = '+';
+    while my $arg = @mode.shift {
+        if $arg.WHAT.perl eq 'Array' {
+            @chan_modes = $arg;
+            next;
+        }
+        elsif $arg.WHAT.perl eq 'Hash' {
+            $stat_modes = join '', $arg.keys;
+            next;
+        }
+        elsif ($arg ~~ /^<[\- +]>/ or $count == 0) {
+            my $action = '+';
 
-                for $arg.comb -> $c {
-                    if $c eq '+' | '-' {
-                        $action = $c;
-                    }
-                    else {
-                        %hash.push('modes' => $action ~ $c);
-                    }
+            for $arg.comb -> $c {
+                if $c eq '+' | '-' {
+                    $action = $c;
+                }
+                else {
+                    %hash.push('modes' => $action ~ $c);
+                }
 
-                    if @chan_modes[0].elems
-                        && @chan_modes[1].elems
-                        && $stat_modes.elems {
+                if @chan_modes[0].elems
+                    && @chan_modes[1].elems
+                    && $stat_modes.elems {
 
-                        # This is a really ugly way of getting around the fact
-                        # that variable interpolation in character classes is
-                        # now illegal in Perl 6. Imagine this as if it were:
-                        #
-                        # $c ~~ /<[$stat_modes @chan_modes[0] @chan_modes[1]]>/
+                    # This is a really ugly way of getting around the fact
+                    # that variable interpolation in character classes is
+                    # now illegal in Perl 6. Imagine this as if it were:
+                    #
+                    # $c ~~ /<[$stat_modes @chan_modes[0] @chan_modes[1]]>/
 
-                        my @a = @chan_modes[0..1].join('').comb;
+                    my @a = @chan_modes[0..1].join('').comb;
 
-                        %hash.push('args' => @mode.shift)
-                            if $c ~~ ($stat_modes.comb | any(@a));
-                    }
+                    %hash.push('args' => @mode.shift)
+                        if $c ~~ ($stat_modes.comb | any(@a));
+                }
 
-                    if @chan_modes[2].elems
-                        && $action eq '+'
-                        && $c ~~ (any(@chan_modes[2].join.comb)) {
+                if @chan_modes[2].elems
+                    && $action eq '+'
+                    && $c ~~ (any(@chan_modes[2].join.comb)) {
 
-                        %hash.push('args' => @mode.shift)
-                    }
+                    %hash.push('args' => @mode.shift)
                 }
             }
-            else {
-                %hash.push('args' => $arg);
-            }
-
-            $count++;
         }
-    }
-    CATCH {
-        # Do nothing, just make sure things aren't borked by @mode.shift
+        else {
+            %hash.push('args' => $arg);
+        }
+
+        $count++;
     }
 
     return %hash;
